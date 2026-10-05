@@ -35,8 +35,9 @@
     </div>
     <div class="flex items-center gap-1" role="group" aria-label="Data source">
       <span class="text-gray-500">From</span>
-      <% { "both" => "Both", "inaturalist" => "iNaturalist", "ebird" => "eBird" }.each do |key, name| %>
-        <button type="button" class="explorer-choice" data-explorer-target="source" data-action="explorer#chooseSource" data-source="<%= key %>" aria-pressed="<%= key == "both" %>"><%= name %></button>
+      <%# iNaturalist first: it covers the whole region and year evenly, while eBird is only collected for the counties of featured sites. %>
+      <% { "inaturalist" => "iNaturalist", "ebird" => "eBird (site counties)", "both" => "Both" }.each do |key, name| %>
+        <button type="button" class="explorer-choice" data-explorer-target="source" data-action="explorer#chooseSource" data-source="<%= key %>" aria-pressed="<%= key == "inaturalist" %>"><%= name %></button>
       <% end %>
     </div>
     <div class="flex items-center gap-1" role="group" aria-label="Zoom to">

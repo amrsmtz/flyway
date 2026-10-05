@@ -36,7 +36,7 @@ export default class extends Controller {
 
   connect() {
     this.group = "all"
-    this.source = "both"
+    this.source = "inaturalist"
     this.windowDays = 7
     this.cubes = {}
     this.activeCells = new Set()
