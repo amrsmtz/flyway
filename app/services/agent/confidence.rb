@@ -4,8 +4,8 @@ module Agent
   # same level, with the reasons spelled out.
   class Confidence
     # Flags that make a conclusion unsafe, and flags that only weaken it.
-    LOW = %w[few_inaturalist_records few_checklists few_nights ebird_not_collected].freeze
-    MEDIUM = %w[recent_days_incomplete many_unconfirmed includes_forecast unequal_effort checklists_not_held].freeze
+    LOW = %w[few_inaturalist_records few_checklists ebird_not_collected].freeze
+    MEDIUM = %w[recent_days_incomplete many_unconfirmed includes_forecast unequal_effort checklists_not_held few_nights].freeze
     MAX_REASONS = 4
 
     def initialize(run:, freshness:, unverified_numbers:, cannot_answer:)
