@@ -11,9 +11,13 @@ module Ebird
     # Migration periods inside the 12-month window.
     SEASONS = [ Date.new(2025, 8, 15)..Date.new(2025, 11, 15), Date.new(2026, 3, 15)..Date.new(2026, 6, 10) ].freeze
 
+    # Lower runs first. The migration seasons of the flagship counties come
+    # before the recent weeks: they are a few hours of quota, and comparing
+    # seasons is impossible without them, while the recent weeks' full
+    # checklists take most of a day.
     PRIORITY_LIVE = 5
+    PRIORITY_SEASON_FLAGSHIP = 10
     PRIORITY_RECENT = 20
-    PRIORITY_SEASON_FLAGSHIP = 30
     PRIORITY_SEASON = 40
     PRIORITY_FLAGSHIP = 50
     PRIORITY_REST = 60
