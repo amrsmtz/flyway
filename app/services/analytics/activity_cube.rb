@@ -69,10 +69,11 @@ module Analytics
     def boundaries(cells)
       return [] if cells.empty?
 
-      outlines = ActiveRecord::Base.connection.select_rows(<<~SQL).to_h
+      sql = ApplicationRecord.sanitize_sql_array([ <<~SQL, cells ])
         SELECT cell, h3_cell_to_boundary(cell::h3index)::text
-        FROM unnest(ARRAY[#{cells.join(",")}]::bigint[]) AS cell
+        FROM unnest(ARRAY[?]::bigint[]) AS cell
       SQL
+      outlines = ActiveRecord::Base.connection.select_rows(sql).to_h
 
       cells.map { |cell| outlines.fetch(cell).scan(/-?\d+\.?\d*/).map { |number| number.to_f.round(4) }.each_slice(2).to_a }
     end

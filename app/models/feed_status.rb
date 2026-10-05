@@ -9,7 +9,7 @@ class FeedStatus < ApplicationRecord
   validates :feed, inclusion: { in: FEEDS }
 
   def self.for(feed)
-    create_or_find_by!(feed: feed)
+    find_by(feed: feed) || create_or_find_by!(feed: feed)
   end
 
   def self.record_success(feed, latest_data_at: nil, remaining_quota: nil)
