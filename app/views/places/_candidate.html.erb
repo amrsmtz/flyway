@@ -1,0 +1,25 @@
+<% place = candidate.place %>
+<li class="rounded border p-4 <%= candidate == best ? "border-blue-700" : "border-gray-200" %>">
+  <div class="flex flex-wrap items-baseline gap-x-3">
+    <span class="text-lg font-medium"><%= place.name %></span>
+    <span class="text-sm text-gray-600"><%= place_kind_label(place) %><%= " · #{place.province_code.delete_prefix("CA-")}" if place.province_code %></span>
+    <% if candidate == best %>
+      <span class="text-sm font-medium text-blue-700">Used by default</span>
+    <% end %>
+  </div>
+
+  <% if candidate.match == :approximate %>
+    <p class="mt-1 text-sm text-amber-700">
+      Approximate match on “<%= candidate.matched_name %>” (<%= number_to_percentage(candidate.similarity * 100, precision: 0) %> similar)
+    </p>
+  <% end %>
+
+  <p class="mt-1 text-sm text-gray-600"><%= place_search_area(place) %></p>
+  <% if place.details["description"].present? %>
+    <p class="mt-1 text-sm text-gray-600"><%= place.details["description"] %></p>
+  <% end %>
+
+  <% if (url = place_ebird_url(place)) %>
+    <p class="mt-1 text-sm"><%= link_to "View on eBird", url, target: "_blank", rel: "noopener", class: "text-blue-700 underline" %></p>
+  <% end %>
+</li>

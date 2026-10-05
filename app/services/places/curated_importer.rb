@@ -53,6 +53,7 @@ module Places
     def import_region(definition)
       province_codes = Array(definition["provinces"] || definition.fetch("province"))
       counties = region_counties(definition)
+      area = if counties.any? then "counties" elsif definition["bounds"] then "bounding_box" else "provinces" end
       bounds = definition["bounds"]&.symbolize_keys || union_bounds(counties.presence || province_codes.map { |code| province(code) })
 
       save(definition, kind: "region", **bounds,
@@ -60,7 +61,7 @@ module Places
            parent: (province(province_codes.first) if province_codes.one?),
            latitude: (bounds[:min_latitude] + bounds[:max_latitude]) / 2,
            longitude: (bounds[:min_longitude] + bounds[:max_longitude]) / 2,
-           details: { province_codes: province_codes, county_codes: counties.map(&:ebird_code).presence }.compact)
+           details: { area: area, province_codes: province_codes, county_codes: counties.map(&:ebird_code).presence }.compact)
     end
 
     def region_counties(definition)

@@ -1,0 +1,27 @@
+<% content_for :title, "Place search — Flyway" %>
+
+<p class="text-sm"><%= link_to "← Flyway", root_path, class: "text-blue-700 underline" %></p>
+<h1 class="mt-4 text-3xl font-semibold tracking-tight">Place search</h1>
+<p class="mt-2 text-gray-600">
+  How a place name is understood: provinces, regions, cities, eBird counties and hotspots, and well-known birding sites
+  in Quebec, Ontario and the Maritimes.
+</p>
+
+<%= form_with url: places_path, method: :get, data: { turbo_frame: "results", turbo_action: "advance" }, class: "mt-6 flex gap-2" do |form| %>
+  <%= form.search_field :q, value: @query, placeholder: "Tadoussac, southern Quebec, Kingston NS…", autofocus: true,
+        aria: { label: "Place name" }, class: "flex-1 rounded border border-gray-300 px-3 py-2" %>
+  <%= form.submit "Search", name: nil, class: "rounded bg-blue-700 px-4 py-2 font-medium text-white" %>
+<% end %>
+
+<p class="mt-3 text-sm text-gray-500">
+  Try
+  <% [ "Tadoussac", "Quebec", "Kingston", "the Montreal area", "cap tourmante", "Gaspésie" ].each do |example| %>
+    <%= link_to example, places_path(q: example), data: { turbo_frame: "results", turbo_action: "advance" }, class: "text-blue-700 underline" %>
+  <% end %>
+</p>
+
+<%= turbo_frame_tag "results" do %>
+  <% if @result %>
+    <%= render "results", result: @result %>
+  <% end %>
+<% end %>

@@ -36,4 +36,30 @@ class Place < ApplicationRecord
   def bounding_box?
     [ min_latitude, min_longitude, max_latitude, max_longitude ].all?
   end
+
+  # How observations for this place are selected: a list of provinces or
+  # counties, a bounding box, or a radius around its position.
+  def search_area
+    case kind
+    when "province" then { type: "provinces", province_codes: [ province_code ] }
+    when "county" then { type: "counties", county_codes: [ ebird_code ] }
+    when "region" then region_search_area
+    else { type: "radius", latitude: latitude, longitude: longitude, radius_km: default_radius_km }
+    end
+  end
+
+  private
+
+  # details["area"] records how the region was defined in config/gazetteer.yml.
+  def region_search_area
+    case details["area"]
+    when "counties"
+      { type: "counties", county_codes: details["county_codes"] }
+    when "bounding_box"
+      { type: "bounding_box", province_codes: details["province_codes"], min_latitude: min_latitude,
+        max_latitude: max_latitude, min_longitude: min_longitude, max_longitude: max_longitude }
+    else
+      { type: "provinces", province_codes: details["province_codes"] }
+    end
+  end
 end

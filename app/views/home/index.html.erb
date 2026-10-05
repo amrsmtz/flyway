@@ -1,11 +1,12 @@
 <% content_for :title, "Flyway" %>
 
-<main class="mx-auto max-w-2xl px-6 py-24">
-  <h1 class="text-4xl font-semibold tracking-tight">Flyway</h1>
-  <p class="mt-4 text-lg text-gray-600">
-    Did the weather move the birds? An auditable migration tracker for eastern Canada.
-  </p>
-  <p class="mt-8 text-sm text-gray-500">
-    Deployment skeleton — TimescaleDB <%= @timescaledb_version %> on PostgreSQL <%= @postgres_version %>.
-  </p>
-</main>
+<h1 class="text-4xl font-semibold tracking-tight">Flyway</h1>
+<p class="mt-4 text-lg text-gray-600">
+  Did the weather move the birds? An auditable migration tracker for eastern Canada.
+</p>
+<p class="mt-8">
+  <%= link_to "Search the place gazetteer", places_path, class: "text-blue-700 underline" %>
+</p>
+<p class="mt-8 text-sm text-gray-500">
+  Deployment skeleton — TimescaleDB <%= @timescaledb_version %> on PostgreSQL <%= @postgres_version %>.
+</p>
