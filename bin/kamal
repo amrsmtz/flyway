@@ -10,6 +10,12 @@
 
 ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
 
+# Kamal recognises git failures by their English messages (for example when
+# its build clone already exists). With a localised git it misreads them,
+# deletes the clone and starts over on every deploy.
+ENV["LC_ALL"] = "C"
+ENV["LANGUAGE"] = "en"
+
 require "rubygems"
 require "bundler/setup"
 
