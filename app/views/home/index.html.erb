@@ -1,13 +1,87 @@
-<% content_for :title, "Flyway" %>
+<% content_for :title, "Flyway — did the weather move the birds?" %>
+<% content_for :main_class, "flex h-dvh flex-col" %>
+<% content_for :head do %>
+  <%= javascript_include_tag "maplibre-gl" %>
+<% end %>
 
-<h1 class="text-4xl font-semibold tracking-tight">Flyway</h1>
-<p class="mt-4 text-lg text-gray-600">
-  Did the weather move the birds? An auditable migration tracker for eastern Canada.
-</p>
-<p class="mt-8">
-  <%= link_to "Search the place gazetteer", places_path, class: "text-blue-700 underline" %> ·
-  <%= link_to "Data status", status_path, class: "text-blue-700 underline" %>
-</p>
-<p class="mt-8 text-sm text-gray-500">
-  Deployment skeleton — TimescaleDB <%= @timescaledb_version %> on PostgreSQL <%= @postgres_version %>.
-</p>
+<header class="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-gray-200 px-4 py-2">
+  <div>
+    <span class="text-xl font-semibold tracking-tight">Flyway</span>
+    <span class="ml-2 text-sm text-gray-600">Did the weather move the birds? Bird migration and wind in eastern Canada.</span>
+  </div>
+  <nav class="ml-auto flex flex-wrap items-center gap-x-3 text-sm">
+    <% @feeds.each do |status| %>
+      <%= link_to status_path, class: "flex items-center gap-1", title: "#{status.name}: last collected #{time_ago_or_never(status.last_success_at)}" do %>
+        <span class="inline-block size-2 rounded-full <%= feed_health_dot(status) %>"></span><%= status.name %>
+      <% end %>
+    <% end %>
+    <%= link_to "Data status", status_path, class: "text-blue-700 underline" %>
+    <%= link_to "Places", places_path, class: "text-blue-700 underline" %>
+  </nav>
+</header>
+
+<div class="flex min-h-0 flex-1 flex-col"
+     data-controller="explorer"
+     data-explorer-activity-url-value="<%= map_activity_path %>"
+     data-explorer-wind-url-value="<%= map_wind_path %>"
+     data-explorer-sites-value="<%= @sites.to_json %>">
+  <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-gray-200 px-4 py-2 text-sm">
+    <div class="flex items-center gap-1" role="group" aria-label="Species group">
+      <span class="text-gray-500">Show</span>
+      <button type="button" class="explorer-choice" data-explorer-target="group" data-action="explorer#chooseGroup" data-group="all" aria-pressed="true">All birds</button>
+      <% @groups.each do |key, name| %>
+        <button type="button" class="explorer-choice" data-explorer-target="group" data-action="explorer#chooseGroup" data-group="<%= key %>" aria-pressed="false"><%= name %></button>
+      <% end %>
+    </div>
+    <div class="flex items-center gap-1" role="group" aria-label="Data source">
+      <span class="text-gray-500">From</span>
+      <% { "both" => "Both", "inaturalist" => "iNaturalist", "ebird" => "eBird" }.each do |key, name| %>
+        <button type="button" class="explorer-choice" data-explorer-target="source" data-action="explorer#chooseSource" data-source="<%= key %>" aria-pressed="<%= key == "both" %>"><%= name %></button>
+      <% end %>
+    </div>
+    <div class="flex items-center gap-1" role="group" aria-label="Zoom to">
+      <span class="text-gray-500">Zoom to</span>
+      <% HomeController::PROVINCE_VIEWS.each do |view| %>
+        <button type="button" class="explorer-choice" data-action="explorer#zoomTo" data-bounds="<%= view[:bounds].to_json %>"><%= view[:name] %></button>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="relative min-h-0 flex-1">
+    <div data-explorer-target="map" class="h-full w-full"></div>
+    <div class="absolute left-3 top-3 max-w-xs rounded bg-white/95 p-3 text-xs text-gray-700 shadow">
+      <p class="font-medium text-gray-900" data-explorer-target="legendTitle">Loading a year of observations…</p>
+      <div class="mt-2 h-2 w-full rounded" data-explorer-target="legendRamp"></div>
+      <div class="mt-0.5 flex justify-between text-gray-500"><span data-explorer-target="legendLow"></span><span data-explorer-target="legendHigh"></span></div>
+      <ul class="mt-2 space-y-1">
+        <li><span class="mr-1 inline-block size-3 border border-gray-400 bg-gray-300 align-middle"></span>Grey cell: fewer than 5 bird records, too few to tell.</li>
+        <li>No cell: nobody reported a bird there. That is not the same as no birds.</li>
+        <li>Arrows: wind about 750 m up during the previous night, pointing where the air is going. Most songbirds migrate at night at that height.</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="border-t border-gray-200 px-4 pb-3 pt-2">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+      <button type="button" class="rounded bg-blue-700 px-3 py-1 font-medium text-white" data-explorer-target="play" data-action="explorer#togglePlay">Play</button>
+      <span class="font-medium" data-explorer-target="date"></span>
+      <span class="text-gray-600" data-explorer-target="summary"></span>
+      <div class="ml-auto flex items-center gap-1" role="group" aria-label="Time window">
+        <span class="text-gray-500">Each step shows</span>
+        <button type="button" class="explorer-choice" data-explorer-target="window" data-action="explorer#chooseWindow" data-window="1" aria-pressed="false">1 day</button>
+        <button type="button" class="explorer-choice" data-explorer-target="window" data-action="explorer#chooseWindow" data-window="7" aria-pressed="true">7 days</button>
+      </div>
+    </div>
+    <div class="relative mt-2">
+      <svg data-explorer-target="chart" class="block h-16 w-full" preserveAspectRatio="none" role="img" aria-label="Activity over the last twelve months"></svg>
+      <input type="range" min="0" max="365" value="365" step="1" class="explorer-slider" aria-label="Date"
+             data-explorer-target="slider" data-action="input->explorer#scrub">
+      <div class="relative h-4 text-xs text-gray-500" data-explorer-target="months"></div>
+    </div>
+    <p class="mt-1 text-xs text-gray-500">
+      Bars: <span data-explorer-target="chartNote"></span>
+      Strip below the bars: night wind over the whole region, green when it pushes birds along their seasonal direction
+      (south in fall, north in spring), red when it holds them back.
+    </p>
+  </div>
+</div>

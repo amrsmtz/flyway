@@ -5,6 +5,12 @@ module StatusHelper
     down: "bg-red-100 text-red-800", never: "bg-gray-100 text-gray-700"
   }.freeze
 
+  HEALTH_DOTS = { ok: "bg-green-600", late: "bg-amber-500", down: "bg-red-600", never: "bg-gray-400" }.freeze
+
+  def feed_health_dot(status)
+    HEALTH_DOTS.fetch(status.health)
+  end
+
   def feed_health_badge(status)
     health = status.health
     tag.span(HEALTH_LABELS.fetch(health), class: "rounded px-2 py-0.5 text-sm font-medium #{HEALTH_CLASSES.fetch(health)}")

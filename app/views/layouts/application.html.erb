@@ -24,7 +24,7 @@
   </head>
 
   <body>
-    <main class="mx-auto max-w-3xl px-6 py-16">
+    <main class="<%= content_for(:main_class) || "mx-auto max-w-3xl px-6 py-16" %>">
       <%= yield %>
     </main>
   </body>
