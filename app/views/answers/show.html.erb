@@ -1,0 +1,4 @@
+<% content_for :title, "#{@answer.question} — Flyway" %>
+
+<p class="text-sm"><%= link_to "← Flyway", root_path, class: "text-blue-700 underline" %></p>
+<%= render "answer", answer: @answer %>

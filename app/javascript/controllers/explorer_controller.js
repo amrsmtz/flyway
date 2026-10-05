@@ -409,6 +409,22 @@ export default class extends Controller {
     this.map.fitBounds(JSON.parse(event.currentTarget.dataset.bounds), { padding: 20 })
   }
 
+  // Points the map and timeline at what an answer is about.
+  showAnswer(event) {
+    const { bounds, date, group } = event.currentTarget.dataset
+    const button = this.groupTargets.find((candidate) => candidate.dataset.group === group)
+    if (button) {
+      this.group = group
+      this.press(this.groupTargets, button)
+    }
+
+    const day = Math.round((new Date(`${date}T00:00:00Z`) - this.dateAt(0)) / 86400000)
+    this.day = Math.max(0, Math.min(this.cube.day_count - 1, day))
+    this.sliderTarget.value = this.day
+    this.map.fitBounds(JSON.parse(bounds), { padding: 60, maxZoom: 9 })
+    this.refresh()
+  }
+
   scrub() {
     this.day = Number(this.sliderTarget.value)
     if (this.cube) this.render()

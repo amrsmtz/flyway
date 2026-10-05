@@ -33,6 +33,10 @@ production:
   plan_open_meteo_live_units:
     class: OpenMeteo::PlanLiveJob
     schedule: every hour at minute 20
+  # Suggested questions are answered ahead of time; see AgentAnswer::SUGGESTED.
+  refresh_suggested_answers:
+    class: Agent::RefreshSuggestedJob
+    schedule: every 2 hours at minute 35
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12

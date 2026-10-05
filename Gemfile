@@ -68,3 +68,5 @@ group :test do
 end
 
 gem "rubyzip", "~> 3.7", require: "zip"
+
+gem "ruby_llm", "~> 1.16"

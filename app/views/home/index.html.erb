@@ -47,7 +47,9 @@
     </div>
   </div>
 
-  <div class="relative min-h-0 flex-1">
+  <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col">
+  <div class="relative min-h-64 flex-1">
     <div data-explorer-target="map" class="h-full w-full"></div>
     <div class="absolute left-3 top-3 max-w-xs rounded bg-white/95 p-3 text-xs text-gray-700 shadow">
       <p class="font-medium text-gray-900" data-explorer-target="legendTitle">Loading a year of observations…</p>
@@ -83,5 +85,46 @@
       Strip below the bars: night wind over the whole region, green when it pushes birds along their seasonal direction
       (south in fall, north in spring), red when it holds them back.
     </p>
+  </div>
+  </div>
+
+  <aside class="max-h-[45dvh] overflow-y-auto border-t border-gray-200 p-4 lg:max-h-none lg:w-[26rem] lg:border-l lg:border-t-0"
+         data-controller="ask">
+    <h2 class="text-lg font-semibold">Ask a question</h2>
+    <p class="mt-1 text-sm text-gray-600">
+      Answers are written from the observations and weather shown here, with the figures and sources behind them.
+    </p>
+
+    <%= form_with url: answers_path, data: { turbo_frame: "answer", ask_target: "form", action: "turbo:submit-start->ask#start turbo:submit-end->ask#finish" }, class: "mt-3" do |form| %>
+      <%= form.text_area :question, rows: 2, maxlength: AnswersController::MAX_QUESTION_LENGTH, required: true,
+            placeholder: "Did last night's winds bring more warblers to Tadoussac?", aria: { label: "Your question" },
+            data: { ask_target: "question", action: "keydown.enter->ask#submitOnEnter" },
+            class: "w-full rounded border border-gray-300 px-3 py-2 text-sm" %>
+      <%= form.submit "Ask", name: nil, data: { ask_target: "submit" }, class: "mt-1 rounded bg-blue-700 px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50" %>
+      <span class="ml-2 hidden text-sm text-gray-600" data-ask-target="waiting">Reading the data…</span>
+    <% end %>
+
+    <p class="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">Try one</p>
+    <ul class="mt-1 space-y-1">
+      <% AgentAnswer::SUGGESTED.each do |question| %>
+        <li><button type="button" class="text-left text-sm text-blue-700 underline" data-action="ask#suggest"><%= question %></button></li>
+      <% end %>
+    </ul>
+
+    <%= turbo_frame_tag "answer" %>
+
+    <details class="mt-6 text-sm text-gray-700">
+      <summary class="cursor-pointer font-medium text-gray-900">What do these words mean?</summary>
+      <dl class="mt-2 space-y-2">
+        <div><dt class="font-medium">Checklist</dt><dd>The list of birds one observer or group reported to eBird for one outing, with its duration and distance.</dd></div>
+        <div><dt class="font-medium">Complete checklist</dt><dd>A checklist where the observer reported every species detected. Only then does a missing species mean it was looked for and not found.</dd></div>
+        <div><dt class="font-medium">Reporting rate</dt><dd>The share of complete checklists on which a species or group appears. It does not grow just because more people were out.</dd></div>
+        <div><dt class="font-medium">Research grade</dt><dd>An iNaturalist observation whose identification was confirmed by other members.</dd></div>
+        <div><dt class="font-medium">Tailwind</dt><dd>Wind blowing in the direction the birds are travelling: south in fall, north in spring. A headwind blows against them.</dd></div>
+        <div><dt class="font-medium">925 hPa</dt><dd>A pressure level about 750 m above the ground, the height at which most songbirds migrate at night.</dd></div>
+        <div><dt class="font-medium">Confidence</dt><dd>Computed from the data, not chosen by the language model: it drops when records are few, recent days are still filling up, or the weather is a forecast.</dd></div>
+      </dl>
+    </details>
+  </aside>
   </div>
 </div>

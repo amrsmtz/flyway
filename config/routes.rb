@@ -8,6 +8,8 @@ Rails.application.routes.draw do
   root "home#index"
   resources :places, only: :index
   get "status" => "status#show"
+  resources :answers, only: %i[create show]
+  get "answers/:id/evidence/:key" => "answers#evidence", as: :answer_evidence
   get "map/activity" => "map#activity"
   get "map/wind" => "map#wind"
 
