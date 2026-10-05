@@ -5,7 +5,8 @@
   Did the weather move the birds? An auditable migration tracker for eastern Canada.
 </p>
 <p class="mt-8">
-  <%= link_to "Search the place gazetteer", places_path, class: "text-blue-700 underline" %>
+  <%= link_to "Search the place gazetteer", places_path, class: "text-blue-700 underline" %> ·
+  <%= link_to "Data status", status_path, class: "text-blue-700 underline" %>
 </p>
 <p class="mt-8 text-sm text-gray-500">
   Deployment skeleton — TimescaleDB <%= @timescaledb_version %> on PostgreSQL <%= @postgres_version %>.

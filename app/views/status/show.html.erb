@@ -1,0 +1,107 @@
+<% content_for :title, "Data status — Flyway" %>
+
+<p class="text-sm"><%= link_to "← Flyway", root_path, class: "text-blue-700 underline" %></p>
+<h1 class="mt-4 text-3xl font-semibold tracking-tight">Data status</h1>
+<p class="mt-2 text-gray-600">
+  Where the data comes from, how fresh it is, what is still being collected and what could not be used.
+</p>
+
+<h2 class="mt-10 text-xl font-semibold">Feeds</h2>
+<div class="mt-3 space-y-3">
+  <% @feeds.each do |status| %>
+    <div class="rounded border border-gray-200 p-4">
+      <div class="flex flex-wrap items-baseline gap-x-3">
+        <span class="text-lg font-medium"><%= status.name %></span>
+        <%= feed_health_badge(status) %>
+        <% if status.paused? %>
+          <span class="text-sm text-amber-700">Paused until <%= l status.paused_until, format: :short %> UTC</span>
+        <% end %>
+      </div>
+      <dl class="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700 sm:grid-cols-4">
+        <div><dt class="text-gray-500">Last successful run</dt><dd><%= time_ago_or_never(status.last_success_at) %></dd></div>
+        <div><dt class="text-gray-500">Newest data</dt><dd><%= time_ago_or_never(status.latest_data_at) %></dd></div>
+        <div><dt class="text-gray-500">Collection progress</dt><dd><%= queue_progress(@queues, status.feed) || "—" %></dd></div>
+        <div><dt class="text-gray-500">Requests left this hour</dt><dd><%= status.remaining_quota || "—" %></dd></div>
+      </dl>
+      <% if status.last_error.present? %>
+        <p class="mt-2 text-sm text-gray-600">Last problem (<%= time_ago_or_never(status.last_failure_at) %>): <%= status.last_error %></p>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<h2 class="mt-10 text-xl font-semibold">Collection queue</h2>
+<p class="mt-1 text-sm text-gray-600">
+  Each unit is one piece of work: a county and day, a checklist, a day of observations or a month of weather.
+  Pending units are still to be collected; dead units failed repeatedly and were set aside.
+</p>
+<table class="mt-3 w-full text-sm">
+  <thead>
+    <tr class="border-b text-left text-gray-500"><th class="py-1">Feed</th><th>Unit</th><th>Status</th><th class="text-right">Count</th></tr>
+  </thead>
+  <tbody>
+    <% @queues.sort.each do |(feed, kind, status), count| %>
+      <tr class="border-b border-gray-100">
+        <td class="py-1"><%= FeedStatus::NAMES.fetch(feed, feed) %></td>
+        <td><%= kind.humanize %></td>
+        <td><%= status %></td>
+        <td class="text-right"><%= number_with_delimiter(count) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<% if @dead_units.any? %>
+  <h3 class="mt-6 font-semibold">Latest units set aside</h3>
+  <ul class="mt-2 space-y-1 text-sm text-gray-700">
+    <% @dead_units.each do |unit| %>
+      <li><%= FeedStatus::NAMES.fetch(unit.feed, unit.feed) %> · <%= unit.kind.humanize %> <%= unit.key %> — <%= unit.last_error %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<h2 class="mt-10 text-xl font-semibold">What the data holds</h2>
+<table class="mt-3 w-full text-sm">
+  <thead>
+    <tr class="border-b text-left text-gray-500"><th class="py-1">Source</th><th>Quality</th><th class="text-right">Observations</th></tr>
+  </thead>
+  <tbody>
+    <% @observations.sort.each do |(source, tier), count| %>
+      <tr class="border-b border-gray-100">
+        <td class="py-1"><%= FeedStatus::NAMES.fetch(source, source) %></td>
+        <td><%= tier.humanize %></td>
+        <td class="text-right"><%= number_with_delimiter(count) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+<ul class="mt-3 space-y-1 text-sm text-gray-700">
+  <% @observation_range.each do |source, first_day, last_day| %>
+    <li><%= FeedStatus::NAMES.fetch(source, source) %> observations run from <%= l first_day, format: :long %> to <%= l last_day, format: :long %>.</li>
+  <% end %>
+  <li><%= number_with_delimiter(@checklists) %> full eBird checklists from featured sites.</li>
+  <li>
+    <%= number_with_delimiter(@weather_hours) %> hours of weather<% if @weather_range.all? %>,
+      from <%= l @weather_range.first.to_date, format: :long %> to <%= l @weather_range.last, format: :short %> UTC (later hours are forecasts)<% end %>.
+  </li>
+</ul>
+
+<h2 class="mt-10 text-xl font-semibold">eBird coverage by county</h2>
+<p class="mt-1 text-sm text-gray-600">
+  Days, out of the last 365, for which eBird's own count of checklists and observers is held. A day without that
+  figure is treated as unknown, never as a day without birds.
+</p>
+<div class="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
+  <% @coverage.each do |name, days| %>
+    <div class="flex justify-between border-b border-gray-100 py-0.5"><span><%= name %></span><span class="text-gray-600"><%= days %></span></div>
+  <% end %>
+</div>
+
+<h2 class="mt-10 text-xl font-semibold">Names that could not be matched</h2>
+<p class="mt-1 text-sm text-gray-600">
+  <%= number_with_delimiter(@unmatched_records) %> iNaturalist observations are identified only to a genus, family
+  or higher group, so they cannot count toward a species. They are kept, and still count as observer effort.
+</p>
+<% if @unmatched_taxa.any? %>
+  <p class="mt-2 text-sm text-gray-700"><%= @unmatched_taxa.map { |taxon| "#{taxon.source_name} (#{taxon.source_rank})" }.to_sentence %>.</p>
+<% end %>

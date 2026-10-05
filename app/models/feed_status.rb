@@ -1,6 +1,10 @@
 # Health of one feed, as shown to users and passed to the agent.
 class FeedStatus < ApplicationRecord
   FEEDS = %w[ebird inaturalist open_meteo].freeze
+  NAMES = { "ebird" => "eBird", "inaturalist" => "iNaturalist", "open_meteo" => "Open-Meteo" }.freeze
+  # How long a feed may go without a successful run before it counts as
+  # late. Beyond three times that, it counts as down.
+  EXPECTED_INTERVALS = { "ebird" => 3.hours, "inaturalist" => 1.hour, "open_meteo" => 4.hours }.freeze
 
   validates :feed, inclusion: { in: FEEDS }
 
@@ -27,5 +31,21 @@ class FeedStatus < ApplicationRecord
 
   def paused?
     paused_until.present? && paused_until.future?
+  end
+
+  def name
+    NAMES.fetch(feed)
+  end
+
+  # :ok, :late, :down, or :never when the feed has not succeeded yet.
+  def health(now: Time.current)
+    return :never if last_success_at.nil?
+
+    age = now - last_success_at
+    interval = EXPECTED_INTERVALS.fetch(feed)
+    if age <= interval then :ok
+    elsif age <= interval * 3 then :late
+    else :down
+    end
   end
 end
