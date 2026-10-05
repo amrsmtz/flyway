@@ -14,6 +14,6 @@ every push against the same TimescaleDB image as production.
 ## Consequences
 
 - One description of the schema, exercised constantly, with nothing to keep in sync.
-- Building a fresh database gets slower as migrations accumulate; with fifteen it takes a second.
+- Building a fresh database gets slower as migrations accumulate; with sixteen it takes a second.
 - Tests cannot use `db:test:prepare`; the test database is migrated explicitly.
 - Old migrations must keep working, so they are not edited once deployed.

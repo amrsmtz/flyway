@@ -28,7 +28,11 @@ columnstore compression and a retention policy.
 
 - A continuous aggregate that combines a time zone with `offset` kills the backend on refresh in TimescaleDB
   2.30 (reproduced twice). A time zone with `origin` set to noon gives the same noon-to-noon "night" buckets.
-- Compression keeps updates possible: an update inside a compressed chunk took about 10 ms locally.
+- Compression keeps updates possible: an update inside a compressed chunk took about 10 ms locally. But a
+  statement that looks for rows without bounding the time has to decompress every chunk. The iNaturalist update
+  job did exactly that, hit TimescaleDB's limit of 100,000 decompressed tuples per transaction and stopped two
+  hours after compression was switched on. The status page showed the feed as late; the job now bounds its
+  search in time and the limit is lifted.
 - The Apache-licensed edition offered by most managed PostgreSQL services has neither compression nor
   continuous aggregates, which decided the hosting (ADR 10).
 

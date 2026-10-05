@@ -5,6 +5,8 @@ module Inaturalist
     # Re-read a few minutes before the previous run, in case records were
     # being written while it ran.
     OVERLAP = 5.minutes
+    # Chunks younger than this are not converted to columnstore yet.
+    MOVED_RECORDS_WINDOW = 55.days
 
     private
 
@@ -27,12 +29,18 @@ module Inaturalist
       { records: count, latest_data_at: latest }
     end
 
-    # The observation time is part of the unique key, and observers can
-    # change it. Deleting first keeps an edited record from being duplicated.
+    # Most updates change an identification or a quality grade and keep
+    # the observation time, so an upsert on the unique key is enough. The
+    # time is part of that key, though, and observers can edit it: copies of
+    # these records with another time are deleted first, among recent rows
+    # only. Looking for them across the whole year would mean decompressing
+    # every converted chunk, so an old record whose date is edited can
+    # remain twice.
     def replace(rows)
       Observation.transaction do
-        Observation.where(source: FEED, source_id: rows.pluck(:source_id)).delete_all
-        Observation.insert_all(rows)
+        Observation.where(source: FEED, source_id: rows.pluck(:source_id), observed_at: MOVED_RECORDS_WINDOW.ago..)
+                   .where.not(observed_at: rows.pluck(:observed_at)).delete_all
+        Observation.upsert_all(rows, unique_by: Observation::UNIQUE_KEY, update_only: UPDATABLE)
       end
     end
   end
