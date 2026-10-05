@@ -34,6 +34,21 @@ module Ebird
       get("ref/taxonomy/ebird", params: { fmt: "json" }, timeout: 90)
     end
 
+    # Sub-regions of a region, e.g. the counties ("subnational2") of CA-QC.
+    def sub_regions(parent_code, type: "subnational2")
+      get("ref/region/list/#{type}/#{parent_code}")
+    end
+
+    # Name, centre and bounding box of a region.
+    def region_info(region_code)
+      get("ref/region/info/#{region_code}")
+    end
+
+    # Every hotspot of a region, with its position and all-time totals.
+    def hotspots(region_code)
+      get("ref/hotspot/#{region_code}", params: { fmt: "json" }, timeout: 90)
+    end
+
     private
 
     def get(path, params: {}, timeout: DEFAULT_TIMEOUT)
