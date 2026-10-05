@@ -11,6 +11,11 @@ module Flyway
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.1
 
+    # Migrations are the single source of truth for the schema: schema.rb
+    # cannot represent hypertables, continuous aggregates or the PostGIS and
+    # H3 column types, so it is neither dumped nor loaded.
+    config.active_record.dump_schema_after_migration = false
+
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
