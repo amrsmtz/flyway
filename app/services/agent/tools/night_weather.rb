@@ -5,10 +5,10 @@ module Agent
                   "the seasonal direction of travel, rain, pressure change, and whether each night was favourable for migration. " \
                   "A night is named by the evening it starts: 'last night' is the night of yesterday's date. " \
                   "With a group, also compares bird activity on mornings after favourable and unfavourable nights."
-      param :place, desc: "Place name as the user wrote it"
-      param :date_from, desc: "Evening of the first night, ISO format YYYY-MM-DD"
-      param :date_to, desc: "Evening of the last night, ISO format YYYY-MM-DD"
-      param :group, desc: GROUPS_HINT, required: false
+      parameter :place, description: "Place name as the user wrote it"
+      parameter :date_from, description: "Evening of the first night, ISO format YYYY-MM-DD"
+      parameter :date_to, description: "Evening of the last night, ISO format YYYY-MM-DD"
+      parameter :group, description: GROUPS_HINT, required: false
 
       def name = "night_weather"
 

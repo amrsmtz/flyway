@@ -4,12 +4,12 @@ module Agent
       description "How much a species group (or all birds) is being reported in a place over a period, normalised by " \
                   "observer effort, compared with another period (by default the same number of days just before). " \
                   "Use it for 'is there a wave', 'more or fewer than', and to compare two periods or seasons."
-      param :place, desc: "Place name as the user wrote it (city, region, province or birding site)"
-      param :date_from, desc: "First day, ISO format YYYY-MM-DD"
-      param :date_to, desc: "Last day, ISO format YYYY-MM-DD"
-      param :group, desc: GROUPS_HINT, required: false
-      param :compare_from, desc: "First day of the comparison period, if not the days just before", required: false
-      param :compare_to, desc: "Last day of the comparison period", required: false
+      parameter :place, description: "Place name as the user wrote it (city, region, province or birding site)"
+      parameter :date_from, description: "First day, ISO format YYYY-MM-DD"
+      parameter :date_to, description: "Last day, ISO format YYYY-MM-DD"
+      parameter :group, description: GROUPS_HINT, required: false
+      parameter :compare_from, description: "First day of the comparison period, if not the days just before", required: false
+      parameter :compare_to, description: "Last day of the comparison period", required: false
 
       def name = "migration_activity"
 

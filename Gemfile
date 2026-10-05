@@ -69,4 +69,7 @@ end
 
 gem "rubyzip", "~> 3.7", require: "zip"
 
-gem "ruby_llm", "~> 1.16"
+# Release candidate on purpose: 1.16.0, the latest stable release, carries three
+# regular-expression denial-of-service advisories (CVE-2026-67987, -67989, -67991)
+# that are only fixed from 2.0.0.rc1. Move to 2.0.0 when it is released.
+gem "ruby_llm", "2.0.0.rc4"

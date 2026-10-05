@@ -8,7 +8,6 @@ RubyLLM.configure do |config|
   # A question must feel interactive: fail fast and fall back instead of waiting.
   config.request_timeout = 20
   config.max_retries = 1
-  config.use_new_acts_as = true
 end
 
 Rails.application.config.x.agent.provider = ENV.fetch("AGENT_PROVIDER", "gemini").to_sym
