@@ -6,4 +6,10 @@ namespace :places do
     skipped = result[:counties_without_geometry]
     puts "Skipped #{skipped.size} counties with no geometry and no hotspot: #{skipped.join(", ")}" if skipped.any?
   end
+
+  desc "Import or refresh cities and towns from GeoNames (run after places:import_ebird)"
+  task import_geonames: :environment do
+    result = Places::GeonamesImporter.new.call
+    puts "Imported #{result[:cities]} cities and towns from GeoNames"
+  end
 end
