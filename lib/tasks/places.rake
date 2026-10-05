@@ -12,4 +12,15 @@ namespace :places do
     result = Places::GeonamesImporter.new.call
     puts "Imported #{result[:cities]} cities and towns from GeoNames"
   end
+
+  desc "Import or refresh curated birding sites and regions from config/gazetteer.yml (run after places:import_ebird)"
+  task import_curated: :environment do
+    result = Places::CuratedImporter.new.call
+    puts "Imported #{result[:sites].size} sites and #{result[:regions].size} regions"
+
+    result[:sites].each do |site|
+      hotspots = Place.hotspots.within_km(site.latitude, site.longitude, site.default_radius_km)
+      puts format("  %-36s %2d km  %3d hotspots  %7d checklists", site.name, site.default_radius_km, hotspots.count, site.importance)
+    end
+  end
 end

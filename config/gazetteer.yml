@@ -1,0 +1,239 @@
+# Hand-curated places that no feed provides in the form people name them.
+#
+# sites:   well-known birding sites. Each is a centre and a radius that
+#          gathers the eBird hotspots around it. The centre is the position
+#          of the anchor hotspot (an eBird location id), unless latitude and
+#          longitude are given for sites too long for a single anchor.
+# regions: named areas. Each is either a list of eBird counties of one
+#          province, or a bounding box restricted to some provinces, or
+#          simply whole provinces. Bounding boxes are approximations.
+#
+# Import with: bin/rails places:import_curated (after the eBird import).
+
+sites:
+  - slug: tadoussac
+    name: Tadoussac
+    province: CA-QC
+    anchor: L17
+    radius_km: 10
+    description: Dunes and bird observatory at the mouth of the Saguenay; a fall bottleneck for raptors and songbirds.
+    aliases: [Dunes de Tadoussac, Tadoussac dunes, Observatoire d'oiseaux de Tadoussac, Tadoussac Bird Observatory, OOT]
+  - slug: cap-tourmente
+    name: Cap Tourmente
+    province: CA-QC
+    anchor: L164932
+    radius_km: 6
+    description: National wildlife area east of Quebec City where Snow Geese stage in spring and fall.
+    aliases: [Cap-Tourmente, Réserve nationale de faune du Cap-Tourmente, Cap Tourmente National Wildlife Area, RNF du Cap-Tourmente]
+  - slug: mont-royal
+    name: Mont-Royal
+    province: CA-QC
+    anchor: L453505
+    radius_km: 3
+    description: Wooded hill and cemeteries in the centre of Montreal, a songbird stopover.
+    aliases: [Mount Royal, Parc du Mont-Royal, Mount Royal Park, Mont Royal]
+  - slug: baie-du-febvre
+    name: Baie-du-Febvre
+    province: CA-QC
+    anchor: L1020630
+    radius_km: 8
+    description: Flooded fields on Lac Saint-Pierre, a major spring staging area for Snow Geese.
+    aliases: [Baie du Febvre, Lac Saint-Pierre]
+  - slug: reservoir-beaudet
+    name: Réservoir Beaudet
+    province: CA-QC
+    anchor: L387422
+    radius_km: 3
+    description: Reservoir in Victoriaville where Snow Geese roost in fall.
+    aliases: [Reservoir Beaudet, Parc du Réservoir-Beaudet, Victoriaville reservoir]
+  - slug: ile-saint-bernard
+    name: Île Saint-Bernard
+    province: CA-QC
+    anchor: L465864
+    radius_km: 3
+    description: Wildlife refuge on Lac Saint-Louis at Châteauguay, south-west of Montreal.
+    aliases: [Ile Saint-Bernard, Île St-Bernard, Refuge faunique Marguerite-D'Youville, RF Marguerite-D'Youville]
+  - slug: forillon
+    name: Forillon National Park
+    province: CA-QC
+    latitude: 48.84
+    longitude: -64.32
+    radius_km: 15
+    description: Tip of the Gaspé Peninsula; seabirds and coastal migrants.
+    aliases: [Forillon, Parc national Forillon, PN Forillon]
+  - slug: ile-bonaventure-perce
+    name: Île Bonaventure and Percé
+    province: CA-QC
+    anchor: L295795
+    radius_km: 12
+    description: Gannet colony and coastline at the eastern end of the Gaspé Peninsula.
+    aliases: [Île Bonaventure, Ile Bonaventure, Bonaventure Island, Percé, Perce, Rocher Percé]
+  - slug: point-pelee
+    name: Point Pelee
+    province: CA-ON
+    anchor: L131153
+    radius_km: 8
+    description: Southernmost point of mainland Canada on Lake Erie, famous for spring warbler fallouts.
+    aliases: [Point Pelee National Park, Pointe-Pelée, Parc national de la Pointe-Pelée, Pelee]
+  - slug: long-point
+    name: Long Point
+    province: CA-ON
+    latitude: 42.57
+    longitude: -80.22
+    radius_km: 18
+    description: Sand spit on Lake Erie, home of the Long Point Bird Observatory.
+    aliases: [Long Point Bird Observatory, LPBO]
+  - slug: rondeau
+    name: Rondeau
+    province: CA-ON
+    anchor: L265518
+    radius_km: 7
+    description: Carolinian forest peninsula on Lake Erie.
+    aliases: [Rondeau Provincial Park, Rondeau Park]
+  - slug: presquile
+    name: Presqu'ile
+    province: CA-ON
+    anchor: L351706
+    radius_km: 5
+    description: Peninsula on Lake Ontario near Brighton; waterfowl and songbird migration.
+    aliases: [Presqu'ile Provincial Park, Presquile, Presqu'île]
+  - slug: prince-edward-point
+    name: Prince Edward Point
+    province: CA-ON
+    anchor: L359367
+    radius_km: 6
+    description: National wildlife area and bird observatory at the eastern tip of Prince Edward County.
+    aliases: [Prince Edward Point Bird Observatory, PEPtBO, Prince Edward Point National Wildlife Area]
+  - slug: hawk-cliff
+    name: Hawk Cliff
+    province: CA-ON
+    anchor: L9
+    radius_km: 4
+    description: Fall hawk watch on the north shore of Lake Erie near Port Stanley.
+    aliases: [Hawk Cliff Hawkwatch]
+  - slug: holiday-beach
+    name: Holiday Beach
+    province: CA-ON
+    anchor: L7
+    radius_km: 4
+    description: Fall hawk watch at the western end of Lake Erie.
+    aliases: [Holiday Beach Conservation Area, Holiday Beach Hawk Tower]
+  - slug: tommy-thompson-park
+    name: Tommy Thompson Park
+    province: CA-ON
+    anchor: L351715
+    radius_km: 4
+    description: Man-made peninsula on the Toronto waterfront.
+    aliases: [Leslie Street Spit, Tommy Thompson, Tommy Thompson Nature Reserve]
+  - slug: brier-island
+    name: Brier Island
+    province: CA-NS
+    anchor: L153234
+    radius_km: 8
+    description: Island at the mouth of the Bay of Fundy; fall concentration of hawks and songbirds.
+    aliases: [Brier Island Nova Scotia]
+  - slug: cape-sable-island
+    name: Cape Sable Island
+    province: CA-NS
+    anchor: L151836
+    radius_km: 9
+    description: Southern tip of Nova Scotia, first landfall for many migrants.
+    aliases: [Cape Sable, The Hawk]
+  - slug: hartlen-point
+    name: Hartlen Point
+    province: CA-NS
+    anchor: L151222
+    radius_km: 4
+    description: Headland at the mouth of Halifax Harbour.
+    aliases: [Hartlen]
+  - slug: grand-manan
+    name: Grand Manan
+    province: CA-NB
+    anchor: L164896
+    radius_km: 15
+    description: Island in the Bay of Fundy on the Atlantic flyway.
+    aliases: [Grand Manan Island, Grand-Manan]
+  - slug: tantramar-marshes
+    name: Tantramar Marshes
+    province: CA-NB
+    anchor: L285886
+    radius_km: 8
+    description: Marshes at the head of the Bay of Fundy around Sackville.
+    aliases: [Tantramar, Tantramar Marsh, Sackville Waterfowl Park, Sackville marshes]
+  - slug: pei-national-park
+    name: Prince Edward Island National Park
+    province: CA-PE
+    anchor: L5072617
+    radius_km: 20
+    description: Dunes, ponds and beaches on the north shore of Prince Edward Island.
+    aliases: [PEI National Park, Parc national de l'Île-du-Prince-Édouard, PEI NP]
+
+regions:
+  - slug: eastern-canada
+    name: Eastern Canada
+    provinces: [CA-QC, CA-ON, CA-NB, CA-NS, CA-PE]
+    aliases: [Est du Canada, eastern Canada]
+  - slug: maritimes
+    name: Maritimes
+    provinces: [CA-NB, CA-NS, CA-PE]
+    aliases: [Maritime provinces, The Maritimes, Provinces maritimes, Maritime Canada]
+  - slug: southern-quebec
+    name: Southern Quebec
+    provinces: [CA-QC]
+    bounds: { min_latitude: 44.99, max_latitude: 47.2, min_longitude: -77.5, max_longitude: -69.9 }
+    aliases: [Sud du Québec, southern Québec, south of Quebec, St. Lawrence lowlands]
+  - slug: greater-montreal
+    name: Greater Montreal
+    province: CA-QC
+    counties: [Montréal, Laval, Longueuil, Roussillon, Marguerite-D'Youville, La Vallée-du-Richelieu, Thérèse-De Blainville, Les Moulins, L'Assomption, Deux-Montagnes, Mirabel, Vaudreuil-Soulanges, Beauharnois-Salaberry]
+    aliases: [Grand Montréal, Montreal area, Montreal region, Région de Montréal]
+  - slug: eastern-townships
+    name: Eastern Townships
+    province: CA-QC
+    counties: [Brome-Missisquoi, La Haute-Yamaska, Memphrémagog, Coaticook, Sherbrooke, Le Val-Saint-François, Le Haut-Saint-François, Les Sources, Le Granit]
+    aliases: [Estrie, Cantons-de-l'Est, Cantons de l'Est]
+  - slug: charlevoix
+    name: Charlevoix
+    province: CA-QC
+    counties: [Charlevoix, Charlevoix-Est]
+    aliases: [Charlevoix region, Région de Charlevoix]
+  - slug: gaspe-peninsula
+    name: Gaspé Peninsula
+    province: CA-QC
+    counties: [Avignon, Bonaventure, Le Rocher-Percé, La Côte-de-Gaspé, La Haute-Gaspésie, La Matanie]
+    aliases: [Gaspésie, Gaspesie, Gaspé, Gaspe, Péninsule gaspésienne]
+  - slug: cote-nord
+    name: Côte-Nord
+    province: CA-QC
+    counties: [La Haute-Côte-Nord, Manicouagan, Sept-Rivières, Minganie, Le Golfe-du-Saint-Laurent]
+    aliases: [Cote-Nord, North Shore, Quebec North Shore, Lower North Shore]
+  - slug: st-lawrence-estuary
+    name: St. Lawrence Estuary
+    province: CA-QC
+    counties: [L'Île-d'Orléans, La Côte-de-Beaupré, Charlevoix, Charlevoix-Est, La Haute-Côte-Nord, Manicouagan, Montmagny, L'Islet, Kamouraska, Rivière-du-Loup, Les Basques, Rimouski-Neigette, La Mitis, La Matanie]
+    aliases: [Saint Lawrence Estuary, Estuaire du Saint-Laurent, Bas-Saint-Laurent, Lower St. Lawrence]
+  - slug: saguenay-lac-saint-jean
+    name: Saguenay–Lac-Saint-Jean
+    province: CA-QC
+    counties: [Le Fjord-du-Saguenay, Saguenay, Lac-Saint-Jean-Est, Le Domaine-du-Roy, Maria-Chapdelaine]
+    aliases: [Saguenay Lac-Saint-Jean, Lac-Saint-Jean, Lac Saint-Jean, Saguenay region]
+  - slug: southern-ontario
+    name: Southern Ontario
+    provinces: [CA-ON]
+    bounds: { min_latitude: 41.6, max_latitude: 45.5, min_longitude: -83.2, max_longitude: -74.3 }
+    aliases: [Sud de l'Ontario, south of Ontario]
+  - slug: southwestern-ontario
+    name: Southwestern Ontario
+    provinces: [CA-ON]
+    bounds: { min_latitude: 41.6, max_latitude: 44.3, min_longitude: -83.2, max_longitude: -80.2 }
+    aliases: [Southwest Ontario, Sud-ouest de l'Ontario, Lake Erie north shore]
+  - slug: eastern-ontario
+    name: Eastern Ontario
+    provinces: [CA-ON]
+    bounds: { min_latitude: 44.0, max_latitude: 45.7, min_longitude: -77.6, max_longitude: -74.3 }
+    aliases: [Est de l'Ontario, Ottawa Valley]
+  - slug: bay-of-fundy
+    name: Bay of Fundy
+    provinces: [CA-NB, CA-NS]
+    bounds: { min_latitude: 44.2, max_latitude: 46.0, min_longitude: -67.2, max_longitude: -63.3 }
+    aliases: [Fundy, Baie de Fundy]
