@@ -30,3 +30,18 @@ namespace :ebird do
     puts "Live units scheduled"
   end
 end
+
+namespace :inaturalist do
+  desc "Queue the 12-month iNaturalist backfill, one unit per day"
+  task plan_backfill: :environment do
+    puts "Queued #{Inaturalist::Planner.new.plan_backfill} new units"
+  end
+end
+
+namespace :weather do
+  desc "Create the weather points, then queue 12 months of weather for them"
+  task plan_backfill: :environment do
+    puts "#{WeatherPoint.sync!} weather points"
+    puts "Queued #{OpenMeteo::Planner.new.plan_backfill} new units"
+  end
+end

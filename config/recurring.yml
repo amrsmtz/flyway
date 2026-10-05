@@ -19,6 +19,20 @@ production:
   plan_ebird_live_units:
     class: Ebird::PlanLiveJob
     schedule: every hour at minute 2
+  run_inaturalist_ingestion:
+    class: Ingestion::RunFeedJob
+    args: [ inaturalist ]
+    schedule: every minute
+  plan_inaturalist_live_units:
+    class: Inaturalist::PlanLiveJob
+    schedule: every 15 minutes
+  run_open_meteo_ingestion:
+    class: Ingestion::RunFeedJob
+    args: [ open_meteo ]
+    schedule: every minute
+  plan_open_meteo_live_units:
+    class: OpenMeteo::PlanLiveJob
+    schedule: every hour at minute 20
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
     schedule: every hour at minute 12

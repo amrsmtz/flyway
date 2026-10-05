@@ -23,14 +23,15 @@ class IngestionUnit < ApplicationRecord
 
   # Adds a unit, or sends a finished one back to the queue when its result
   # is older than refresh_after. Used for data that keeps changing, such as
-  # today's observations.
+  # today's observations. An existing unit keeps its scope, where handlers
+  # store their progress.
   def self.schedule(feed:, kind:, key:, scope:, priority:, refresh_after:)
     unit = create_or_find_by!(feed: feed, kind: kind, key: key) do |new_unit|
       new_unit.assign_attributes(scope: scope, priority: priority)
     end
     return unit unless unit.status.in?(%w[done dead]) && unit.finished_at < refresh_after.ago
 
-    unit.update!(status: "pending", priority: priority, scope: scope, attempts: 0, next_attempt_at: Time.current)
+    unit.update!(status: "pending", priority: priority, attempts: 0, next_attempt_at: Time.current)
     unit
   end
 

@@ -6,6 +6,10 @@ module Ebird
     FEED = "ebird".freeze
     # Stop this many calls before the hourly quota is exhausted.
     QUOTA_RESERVE = 20
+    # How long to wait before looking at the quota again. eBird does not say
+    # when its hourly window restarts, so the feed re-checks periodically
+    # (one call each time) instead of guessing.
+    QUOTA_RECHECK = 15.minutes
     # eBird reports observation times in local time, without a zone.
     TIME_ZONES = {
       "CA-QC" => "America/Toronto", "CA-ON" => "America/Toronto",
@@ -22,7 +26,7 @@ module Ebird
       pause_feed("hourly quota nearly used") if @client.remaining_quota && @client.remaining_quota < QUOTA_RESERVE
       result.merge(remaining_quota: @client.remaining_quota)
     rescue Client::RateLimited => e
-      raise Ingestion::Runner::Paused.new(next_quota_window, e.message)
+      raise Ingestion::Runner::Paused.new(QUOTA_RECHECK.from_now, e.message)
     rescue Client::Unavailable => e
       raise Ingestion::Runner::Retryable, e.message
     end
@@ -30,12 +34,7 @@ module Ebird
     private
 
     def pause_feed(reason)
-      FeedStatus.pause(FEED, next_quota_window, reason)
-    end
-
-    # The quota is counted per clock hour.
-    def next_quota_window
-      Time.current.beginning_of_hour + 1.hour + 1.minute
+      FeedStatus.pause(FEED, QUOTA_RECHECK.from_now, reason)
     end
 
     # "2026-10-04 12:52" or "2026-10-04", in the province's local time.

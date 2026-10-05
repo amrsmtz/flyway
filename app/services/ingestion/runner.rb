@@ -20,6 +20,14 @@ module Ingestion
       "ebird" => {
         "county_day" => "Ebird::CountyDayHandler",
         "checklist" => "Ebird::ChecklistHandler"
+      },
+      "inaturalist" => {
+        "day" => "Inaturalist::DayHandler",
+        "updates" => "Inaturalist::UpdatesHandler"
+      },
+      "open_meteo" => {
+        "period" => "OpenMeteo::PeriodHandler",
+        "live" => "OpenMeteo::LiveHandler"
       }
     }.freeze
 
