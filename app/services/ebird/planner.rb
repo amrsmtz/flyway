@@ -8,8 +8,10 @@ module Ebird
     CHECKLIST_WINDOW = 30.days
     # Sites the demonstration relies on; their counties are backfilled first.
     FLAGSHIP_SITES = %w[tadoussac cap-tourmente mont-royal point-pelee].freeze
-    # Migration periods inside the 12-month window.
-    SEASONS = [ Date.new(2025, 8, 15)..Date.new(2025, 11, 15), Date.new(2026, 3, 15)..Date.new(2026, 6, 10) ].freeze
+    # Migration periods inside the 12-month window: last fall, last spring
+    # and the fall in progress.
+    SEASONS = [ Date.new(2025, 8, 15)..Date.new(2025, 11, 15), Date.new(2026, 3, 15)..Date.new(2026, 6, 10),
+                Date.new(2026, 8, 15)..Date.new(2026, 11, 15) ].freeze
 
     # Lower runs first. The migration seasons of the flagship counties come
     # before the recent weeks: they are a few hours of quota, and comparing
