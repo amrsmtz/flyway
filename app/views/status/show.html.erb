@@ -105,3 +105,12 @@
 <% if @unmatched_taxa.any? %>
   <p class="mt-2 text-sm text-gray-700"><%= @unmatched_taxa.map { |taxon| "#{taxon.source_name} (#{taxon.source_rank})" }.to_sentence %>.</p>
 <% end %>
+
+<h2 class="mt-10 text-xl font-semibold">Sources and licences</h2>
+<ul class="mt-2 space-y-1 text-sm text-gray-700">
+  <li><%= link_to "eBird", "https://ebird.org", class: "text-blue-700 underline" %>, Cornell Lab of Ornithology: bird checklists, through the eBird API 2.0.</li>
+  <li><%= link_to "iNaturalist", "https://www.inaturalist.org", class: "text-blue-700 underline" %>: observations and photographs belong to their authors.</li>
+  <li><%= link_to "Open-Meteo", "https://open-meteo.com", class: "text-blue-700 underline" %>: weather data, CC BY 4.0.</li>
+  <li><%= link_to "GeoNames", "https://www.geonames.org", class: "text-blue-700 underline" %>: place names, CC BY 4.0.</li>
+  <li>Basemap: OpenFreeMap, © OpenMapTiles, data from OpenStreetMap contributors.</li>
+</ul>
