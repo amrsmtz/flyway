@@ -4,8 +4,9 @@
 
     <% if answer.status == "failed" %>
       <p class="mt-2 rounded bg-amber-50 p-3 text-amber-900">
-        The language model could not be reached just now, so this question was not answered. The map, the timeline and
-        the suggested questions still work; please try again in a minute.
+        The language model is busy or unreachable just now (it runs on a free tier with a few requests per minute), so
+        this question was not answered. The map, the timeline and the suggested questions still work; please try
+        again in a minute.
       </p>
     <% else %>
       <p class="mt-2 text-base leading-relaxed text-gray-900"><%= answer.text %></p>

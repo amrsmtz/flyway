@@ -32,6 +32,11 @@ choose tools well and write plain sentences, but invent figures and forget cavea
 - It interpreted "last night" as different date ranges on different runs, so the prompt fixes relative dates.
 - The largest model listed for the key answered "service unavailable" on every attempt; the lite model was
   fast and reliable, so it became the primary and a mid-size one the fallback.
+- The free tier is limited per minute, not only per day: 5 requests for the fallback model, and the primary
+  refused after about 18. Running the test questions back to back exhausted both. The app now caps new
+  questions at six a minute overall.
+- A failed attempt on one model used to leave its tool results, and its used-up tool budget, to the next model;
+  each attempt now starts clean.
 
 ## Consequences
 

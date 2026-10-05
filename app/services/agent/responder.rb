@@ -15,7 +15,7 @@ module Agent
     private
 
     def ask(question)
-      return limit_reached(question) if AgentAnswer.daily_limit_reached?
+      return limit_reached(question) if AgentAnswer.limit_reached?
 
       answer = Orchestrator.new.call(question)
       answer.save!
@@ -25,7 +25,7 @@ module Agent
     def limit_reached(question)
       AgentAnswer.latest_for(question) ||
         AgentAnswer.new(question: question, question_key: AgentAnswer.question_key_for(question), status: "failed",
-                        error: "The daily limit of questions to the language model is reached.")
+                        error: "The limit of questions to the language model is reached for now.")
     end
   end
 end

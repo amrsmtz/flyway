@@ -15,7 +15,9 @@ module Agent
         #{calendar}
 
         How to work:
-        - Call every tool you need in a single turn, in parallel. Pass place names exactly as the user wrote them.
+        - Call every tool you need in a single turn, in parallel. Pass place names exactly as the user wrote them,
+          spelling mistakes included: the tools match names themselves and report how.
+        - If the question is not about birds or weather in this region, call no tool and say what you can answer.
         - "Last night" is the night of #{(@today - 1).iso8601}; to see what followed it, look at observations for #{@today.iso8601}.
         - If the question names no place, use "eastern Canada". If it names no period, use the last 7 days.
         - A question about weather and birds needs both night_weather and migration_activity.

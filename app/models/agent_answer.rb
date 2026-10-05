@@ -13,8 +13,12 @@ class AgentAnswer < ApplicationRecord
     "Which areas have too few observations to draw any conclusion?"
   ].freeze
   SUGGESTED_FRESH_FOR = 3.hours
-  # Upper bound on questions sent to the model per day, all visitors together.
+  # Upper bounds on questions sent to the model, all visitors together. The
+  # free tier allows the fallback model 5 requests a minute and the primary
+  # one somewhat more (it refused after about 18 in a minute); a question
+  # takes two requests.
   DAILY_LIMIT = 300
+  MINUTE_LIMIT = 6
 
   validates :question, :question_key, presence: true
   validates :status, inclusion: { in: STATUSES }
@@ -39,8 +43,10 @@ class AgentAnswer < ApplicationRecord
     where(question_key: question_key_for(question)).where.not(status: "failed").order(:created_at)
   end
 
-  def self.daily_limit_reached?
-    where(created_at: Time.current.beginning_of_day..).where.not(model: nil).count >= DAILY_LIMIT
+  def self.limit_reached?
+    asked = where.not(model: nil)
+    asked.where(created_at: 1.minute.ago..).count >= MINUTE_LIMIT ||
+      asked.where(created_at: Time.current.beginning_of_day..).count >= DAILY_LIMIT
   end
 
   def evidence_set(key)

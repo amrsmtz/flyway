@@ -172,8 +172,8 @@ absorb late data, and through a credible path to much more data.
 - **Confidence and freshness are computed by the server** from the flags raised by the tools and from feed
   health, with the reasons listed. The same evidence always gives the same level.
 - **Free-tier survival**: answers are cached, the suggested questions are answered ahead of time every two
-  hours, questions are rate limited, a second model takes over when the first is unavailable, and the last good
-  answer is reused when no model can be reached.
+  hours, questions are rate limited per visitor and overall, a second model takes over when the first is
+  unavailable or out of quota, and the last good answer is reused when no model can be reached.
 - **Swappable provider**: `AGENT_PROVIDER` and `AGENT_MODELS` choose the vendor and the model chain (RubyLLM).
 
 ## Known limitations
@@ -187,7 +187,12 @@ absorb late data, and through a credible path to much more data.
 - Wind is shown per night on the map; the hourly data is stored but not animated.
 - There is no automated test suite beyond linting, security scans and replaying migrations in CI. The agent was
   checked by hand against the example questions.
-- The model's daily free-tier quota was never measured; the limits above are the protection.
+- The free model tier allows only a few requests per minute: 5 for the fallback model, and the primary one
+  refused after about 18. The app therefore sends at most six new questions a minute for all visitors together;
+  beyond that it shows the last good answer to the same question, or asks to wait. The daily quota was never
+  reached and is not known.
+- RubyLLM is pinned to a release candidate (2.0.0.rc4): the latest stable release carries three
+  denial-of-service advisories that are only fixed from 2.0.0.rc1.
 - Citizen observations show birds after they land. Nocturnal migration itself would need weather radar (below).
 
 ## Scaling

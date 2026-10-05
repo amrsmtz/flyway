@@ -28,8 +28,7 @@ module Agent
     # Returns an unsaved AgentAnswer.
     def call(question)
       started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-      run = Run.new
-      content, model = ask(question, run)
+      run, content, model = ask(question)
       build(question, run, content, model).tap { |answer| answer.duration_ms = elapsed_ms(started) }
     rescue RubyLLM::Error, Faraday::Error => e
       AgentAnswer.new(question: question, question_key: AgentAnswer.question_key_for(question), status: "failed",
@@ -39,14 +38,17 @@ module Agent
     private
 
     # Tries each configured model in turn; a model that is overloaded or
-    # out of quota passes the question to the next one.
-    def ask(question, run)
+    # out of quota passes the question to the next one. Each attempt starts
+    # a fresh run, so a failed attempt leaves no tool results or used-up
+    # tool budget behind.
+    def ask(question)
       models = Rails.configuration.x.agent.models
       models.each_with_index do |model, index|
+        run = Run.new
         chat = RubyLLM.chat(model: model, provider: Rails.configuration.x.agent.provider, assume_model_exists: true)
                       .with_instructions(Prompt.new.to_s).with_temperature(0.2)
                       .with_tools(*TOOLS.map { |tool| tool.new(run) }).with_schema(ANSWER_SCHEMA)
-        return [ chat.ask(question).content, model ]
+        return [ run, chat.ask(question).content, model ]
       rescue RubyLLM::Error, Faraday::Error
         raise if index == models.size - 1
       end
