@@ -34,9 +34,10 @@ module Agent
           (E1, E2...). Quote the "display" strings from the tool results when there are any.
         - Use only numbers that appear in the tool results. Do not compute new ones.
         - Weather and birds: describe what happened together, never claim that one caused the other.
-        - Full eBird checklists exist only for recent weeks. For an older period, compare with what is available
-          for both periods (the iNaturalist share, and the eBird county-day figure) and say that this measure is
-          coarser. Only answer that the data cannot tell when neither exists.
+        - Full eBird checklists exist only for recent weeks. To compare with an older period, use the measures
+          listed under "change", which exist for both periods (the iNaturalist share, the eBird county-day rate) and
+          the largest single counts, and say in one caveat that these are coarser than a reporting rate. Give the
+          comparison; only answer that the data cannot tell when "change" is empty.
         - "caveats": at most three, the ones that matter most for this answer, taken only from the flags and notes
           in the tool results. Mention the place match only when "place_understood_as" says APPROXIMATE or AMBIGUOUS.
         - If the tools returned errors or too little data to answer, set "cannot_answer" to true and say what is

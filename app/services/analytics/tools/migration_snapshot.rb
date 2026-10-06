@@ -88,7 +88,19 @@ module Analytics
         # on how many county-days with effort was the group reported at all?
         detected = scope.distinct.count(Arel.sql("(county_code, observed_on)"))
         figures.merge(county_days_group_detected: detected,
-                      display: share_display(detected, figures[:county_days_with_figures], "county-days with eBird checklists"))
+                      county_day_rate_percent: percent(detected, figures[:county_days_with_figures]),
+                      display: share_display(detected, figures[:county_days_with_figures], "county-days with eBird checklists"),
+                      **largest_count(scope))
+      end
+
+      # The biggest number of individuals on a single eBird record: for
+      # flocking birds, a direct sign of how many were around.
+      def largest_count(scope)
+        count, day = scope.where.not(individual_count: nil).order(individual_count: :desc).pick(:individual_count, :observed_on)
+        return {} unless count
+
+        { largest_single_count: count, largest_single_count_on: day.iso8601,
+          largest_count_display: "#{count.to_fs(:delimited)} individuals on one eBird record (#{day.to_fs(:long)})" }
       end
 
       def change(current, baseline)
@@ -96,7 +108,9 @@ module Analytics
 
         {
           inaturalist_share: share_change(current[:inaturalist], baseline[:inaturalist], :group_records, :bird_records, :group_share_percent),
-          ebird_reporting_rate: share_change(current[:ebird_site], baseline[:ebird_site], :checklists_reporting, :complete_checklists, :reporting_rate_percent)
+          ebird_reporting_rate: share_change(current[:ebird_site], baseline[:ebird_site], :checklists_reporting, :complete_checklists, :reporting_rate_percent),
+          ebird_county_days: share_change(current[:ebird_counties], baseline[:ebird_counties], :county_days_group_detected,
+                                          :county_days_with_figures, :county_day_rate_percent)
         }.compact
       end
 
@@ -117,6 +131,27 @@ module Analytics
         names = Taxon.where(id: counts.keys).pluck(:id, :common_name).to_h
 
         counts.map { |species_id, count| { species: names[species_id], inaturalist_records: count } }
+      end
+
+      # The eBird records behind the county-day rate and the largest count,
+      # biggest counts first, each linking to its checklist.
+      def add_county_evidence
+        records = @period.apply(@area.observations("ebird")).where(species_group_id: @group.id).where.not(species_id: nil)
+                         .order(Arel.sql("individual_count DESC NULLS LAST")).limit(EVIDENCE_SAMPLE).includes(:species)
+        return if records.empty?
+
+        evidence(
+          title: "eBird #{@group.name.downcase} records, counties of #{@area.name}, #{@period}",
+          method: "One eBird record per species, county and day (the latest one that day), for the counties of #{@area.name}. " \
+                  "The county-day rate is the share of county-days with checklists on which the group was reported. " \
+                  "Records are listed from the largest count down.",
+          source: "eBird",
+          records: records.map do |observation|
+            count = observation.individual_count ? "#{observation.individual_count.to_fs(:delimited)} individuals" : "present, not counted"
+            { label: observation.species.common_name, date: observation.observed_on.iso8601,
+              detail: "#{count}, #{observation.quality_tier}", url: observation.source_url }
+          end
+        )
       end
 
       def add_flags(current)
@@ -145,6 +180,8 @@ module Analytics
                   "The share is the group's records divided by all bird records in the same place and period.",
           source: "iNaturalist", records: inaturalist_records(inaturalist)
         )
+
+        add_county_evidence if @group
 
         checklists = @period.apply(@area.checklists).complete
         return if checklists.none?
