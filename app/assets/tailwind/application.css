@@ -94,7 +94,7 @@
 @layer components {
   /* Links of the header navigation. */
   .nav-link {
-    @apply rounded-md px-2.5 py-1 text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 max-sm:py-2;
+    @apply inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-gray-700 transition-colors hover:bg-gray-100 hover:text-gray-900 max-sm:py-2;
   }
   .nav-link[aria-current="page"] {
     @apply bg-gray-100 font-medium text-gray-900;
