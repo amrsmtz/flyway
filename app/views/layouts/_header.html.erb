@@ -8,7 +8,8 @@
     <span class="hidden truncate text-sm text-gray-500 min-[1100px]:inline">Did the weather move the birds? Bird migration and wind in eastern Canada.</span>
   <% end %>
   <nav class="ml-auto flex flex-wrap items-center gap-1 text-sm min-[1100px]:shrink-0">
-    <%= link_to status_path, class: "mr-1 flex items-center gap-1.5 rounded-full border border-gray-200 px-3 py-1 text-gray-700 transition-colors hover:bg-gray-50 max-sm:py-2 sm:gap-3" do %>
+    <%# Dropped on the narrowest phones, where it would push the links to a second row; "Data status" leads to the same page. %>
+    <%= link_to status_path, class: "mr-1 flex items-center max-[412px]:hidden gap-1.5 rounded-full border border-gray-200 px-3 py-1 text-gray-700 transition-colors hover:bg-gray-50 max-sm:py-2 sm:gap-3" do %>
       <% feed_statuses.each do |status| %>
         <span class="flex items-center gap-1.5" title="<%= status.name %>: last collected <%= time_ago_or_never(status.last_success_at) %>">
           <span class="inline-block size-2 rounded-full <%= feed_health_dot(status) %>"></span><span class="max-sm:sr-only"><%= status.name %></span>
