@@ -17,6 +17,13 @@
   body {
     @apply bg-surface text-gray-900;
   }
+
+  /* Tailwind resets buttons to the default arrow. */
+  a[href],
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
 }
 
 /* Dark mode follows the browser's setting. Instead of a dark variant on
