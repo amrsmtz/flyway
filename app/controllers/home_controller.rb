@@ -15,6 +15,5 @@ class HomeController < ApplicationController
     @sites = Place.sites.order(:name).map do |site|
       { name: site.name, longitude: site.longitude, latitude: site.latitude, description: site.details["description"] }
     end
-    @feeds = FeedStatus::FEEDS.map { |feed| FeedStatus.for(feed) }
   end
 end

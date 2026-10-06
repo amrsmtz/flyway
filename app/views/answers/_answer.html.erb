@@ -1,62 +1,67 @@
 <%= turbo_frame_tag "answer" do %>
   <article class="mt-4 text-sm">
-    <p class="font-medium text-gray-900"><%= answer.question %></p>
+    <p class="ml-auto w-fit max-w-[85%] rounded-2xl rounded-br-md bg-gray-100 px-3.5 py-2 text-gray-900"><%= answer.question %></p>
 
     <% if answer.status == "failed" %>
-      <p class="mt-2 rounded bg-amber-50 p-3 text-amber-900">
+      <p class="mt-4 rounded-xl bg-amber-50 p-3 text-amber-900">
         The language model is busy or unreachable just now (it runs on a free tier with a few requests per minute), so
         this question was not answered. The map, the timeline and the suggested questions still work; please try
         again in a minute.
       </p>
     <% else %>
-      <p class="mt-2 text-base leading-relaxed text-gray-900"><%= answer.text %></p>
+      <p class="mt-4 text-[0.9375rem] leading-relaxed text-gray-900"><%= answer.text %></p>
 
       <% if answer.key_figures.any? %>
-        <h3 class="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">Key figures</h3>
-        <ul class="mt-1 space-y-1">
+        <h3 class="mt-5 text-xs font-semibold uppercase tracking-wide text-gray-500">Key figures</h3>
+        <ul class="mt-2 divide-y divide-gray-200 rounded-xl border border-gray-200">
           <% answer.key_figures.each do |figure| %>
-            <li>
+            <li class="px-3 py-2">
               <%= figure["text"] %>
               <% figure["evidence"].to_a.each do |key| %>
-                <%= link_to "[#{key}]", answer_evidence_path(answer, key), target: "_blank", rel: "noopener",
-                      class: "text-link underline", title: answer.evidence_set(key)&.dig("title") %>
+                <%= link_to key, answer_evidence_path(answer, key), target: "_blank", rel: "noopener",
+                      class: "evidence-chip", title: answer.evidence_set(key)&.dig("title") %>
               <% end %>
             </li>
           <% end %>
         </ul>
       <% end %>
 
-      <div class="mt-4 flex flex-wrap items-center gap-2">
-        <%= confidence_badge(answer) %>
-        <% if (view = answer_map_view(answer)) %>
-          <button type="button" class="explorer-choice" data-action="explorer#showAnswer"
-                  data-bounds="<%= view[:bounds].to_json %>" data-date="<%= view[:date] %>" data-group="<%= view[:group] %>">Show on map</button>
-        <% end %>
+      <div class="mt-5 rounded-xl bg-gray-50 p-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <%= confidence_badge(answer) %>
+          <% if (view = answer_map_view(answer)) %>
+            <button type="button" class="ml-auto inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-raised px-2.5 py-1 text-xs font-medium text-gray-700 shadow-sm transition-colors hover:border-gray-400 hover:text-gray-900"
+                    data-action="explorer#showAnswer"
+                    data-bounds="<%= view[:bounds].to_json %>" data-date="<%= view[:date] %>" data-group="<%= view[:group] %>">
+              <svg viewBox="0 0 16 16" class="size-3.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="M8 14.5s4.5-4.2 4.5-8a4.5 4.5 0 0 0-9 0c0 3.8 4.5 8 4.5 8z"/><circle cx="8" cy="6.5" r="1.6"/></svg>Show on map
+            </button>
+          <% end %>
+        </div>
+        <ul class="mt-2 list-disc space-y-0.5 pl-5 text-gray-700">
+          <% answer.confidence_reasons.each do |reason| %><li><%= reason %></li><% end %>
+        </ul>
       </div>
-      <ul class="mt-1 list-disc space-y-0.5 pl-5 text-gray-700">
-        <% answer.confidence_reasons.each do |reason| %><li><%= reason %></li><% end %>
-      </ul>
 
       <% if answer.caveats.any? %>
-        <h3 class="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">Keep in mind</h3>
-        <ul class="mt-1 list-disc space-y-0.5 pl-5 text-gray-700">
+        <h3 class="mt-5 text-xs font-semibold uppercase tracking-wide text-gray-500">Keep in mind</h3>
+        <ul class="mt-2 list-disc space-y-0.5 pl-5 text-gray-700">
           <% answer.caveats.each do |caveat| %><li><%= caveat %></li><% end %>
         </ul>
       <% end %>
 
       <% if answer.evidence.any? %>
-        <h3 class="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">Sources</h3>
-        <ul class="mt-1 space-y-0.5">
+        <h3 class="mt-5 text-xs font-semibold uppercase tracking-wide text-gray-500">Sources</h3>
+        <ul class="mt-2 space-y-1.5">
           <% answer.evidence.each do |set| %>
             <li>
-              <%= link_to "[#{set["key"]}]", answer_evidence_path(answer, set["key"]), target: "_blank", rel: "noopener", class: "text-link underline" %>
+              <%= link_to set["key"], answer_evidence_path(answer, set["key"]), target: "_blank", rel: "noopener", class: "evidence-chip" %>
               <%= set["title"] %> <span class="text-gray-500">· <%= set["source"] %></span>
             </li>
           <% end %>
         </ul>
       <% end %>
 
-      <p class="mt-4 text-xs text-gray-500">
+      <p class="mt-5 border-t border-gray-200 pt-3 text-xs text-gray-500">
         Data freshness: <%= freshness_sentence(answer).presence || "no feed was used" %>.
         Answer written <%= time_ago_in_words(answer.created_at || Time.current) %> ago<%= " by #{answer.model}" if answer.model %>.
         <%= link_to "Link to this answer", answer_path(answer), target: "_blank", rel: "noopener", class: "underline" if answer.persisted? %>

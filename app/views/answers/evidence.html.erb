@@ -1,11 +1,13 @@
 <% content_for :title, "#{@evidence["key"]}: #{@evidence["title"]} — Flyway" %>
 
-<p class="text-sm"><%= link_to "← Back to the answer", answer_path(@answer), class: "text-link underline" %></p>
-<p class="mt-4 text-sm font-medium text-gray-500">Evidence <%= @evidence["key"] %> · <%= @evidence["source"] %></p>
-<h1 class="mt-1 text-2xl font-semibold tracking-tight"><%= @evidence["title"] %></h1>
+<p class="text-sm"><%= link_to "← Back to the answer", answer_path(@answer), class: "nav-link -ml-2.5" %></p>
+<p class="mt-6 flex items-center gap-2 text-sm text-gray-500">
+  <span class="rounded-md bg-gray-100 px-1.5 py-0.5 text-xs font-medium text-link"><%= @evidence["key"] %></span><%= @evidence["source"] %>
+</p>
+<h1 class="mt-2 text-2xl font-semibold tracking-tight"><%= @evidence["title"] %></h1>
 <p class="mt-2 text-gray-600">For the question: “<%= @answer.question %>”</p>
 
-<h2 class="mt-8 text-lg font-semibold">How this was obtained</h2>
+<h2 class="mt-10 text-lg font-semibold tracking-tight">How this was obtained</h2>
 <p class="mt-1 text-gray-700"><%= @evidence["method"] %></p>
 
 <% call = @answer.tool_results.select { |entry| entry["tool"] == @evidence["tool"] && entry["error"].nil? }.first %>
@@ -16,24 +18,26 @@
   </p>
 <% end %>
 
-<h2 class="mt-8 text-lg font-semibold">Underlying records</h2>
+<h2 class="mt-10 text-lg font-semibold tracking-tight">Underlying records</h2>
 <% if @evidence["records"].any? %>
   <p class="mt-1 text-sm text-gray-600">The most recent ones, each linking to its original source.</p>
-  <table class="mt-3 w-full text-sm">
-    <thead>
-      <tr class="border-b text-left text-gray-500"><th class="py-1">Record</th><th>Date</th><th>Detail</th><th>Source</th></tr>
-    </thead>
-    <tbody>
-      <% @evidence["records"].each do |record| %>
-        <tr class="border-b border-gray-100 align-top">
-          <td class="py-1 pr-3"><%= record["label"] %></td>
-          <td class="pr-3 whitespace-nowrap"><%= record["date"] %></td>
-          <td class="pr-3 text-gray-700"><%= record["detail"] %></td>
-          <td><%= link_to "Open original", record["url"], target: "_blank", rel: "noopener", class: "text-link underline" if record["url"] %></td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <div class="table-frame mt-4">
+    <table class="data-table">
+      <thead>
+        <tr><th>Record</th><th>Date</th><th>Detail</th><th>Source</th></tr>
+      </thead>
+      <tbody>
+        <% @evidence["records"].each do |record| %>
+          <tr class="align-top">
+            <td><%= record["label"] %></td>
+            <td class="whitespace-nowrap tabular-nums"><%= record["date"] %></td>
+            <td class="text-gray-700"><%= record["detail"] %></td>
+            <td class="whitespace-nowrap"><%= link_to "Open original", record["url"], target: "_blank", rel: "noopener", class: "prose-link" if record["url"] %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
 <% else %>
   <p class="mt-1 text-gray-700">
     No individual record to list: this figure is a count over many records, or the count was zero. The method above

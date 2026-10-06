@@ -1,10 +1,10 @@
 <% place = candidate.place %>
-<li class="rounded border p-4 <%= candidate == best ? "border-blue-700" : "border-gray-200" %>">
-  <div class="flex flex-wrap items-baseline gap-x-3">
+<li class="rounded-xl border p-4 shadow-sm <%= candidate == best ? "border-blue-700 ring-2 ring-blue-700/15" : "border-gray-200" %>">
+  <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
     <span class="text-lg font-medium"><%= place.name %></span>
     <span class="text-sm text-gray-600"><%= place_kind_label(place) %><%= " · #{place.province_code.delete_prefix("CA-")}" if place.province_code %></span>
     <% if candidate == best %>
-      <span class="text-sm font-medium text-link">Used by default</span>
+      <span class="rounded-full bg-blue-700 px-2.5 py-0.5 text-xs font-medium text-white">Used by default</span>
     <% end %>
   </div>
 
@@ -20,6 +20,6 @@
   <% end %>
 
   <% if (url = place_ebird_url(place)) %>
-    <p class="mt-1 text-sm"><%= link_to "View on eBird", url, target: "_blank", rel: "noopener", class: "text-link underline" %></p>
+    <p class="mt-2 text-sm"><%= link_to "View on eBird", url, target: "_blank", rel: "noopener", class: "prose-link" %></p>
   <% end %>
 </li>

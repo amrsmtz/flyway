@@ -1,80 +1,83 @@
 <% content_for :title, "Data status — Flyway" %>
 
-<p class="text-sm"><%= link_to "← Flyway", root_path, class: "text-link underline" %></p>
-<h1 class="mt-4 text-3xl font-semibold tracking-tight">Data status</h1>
+<h1 class="text-3xl font-semibold tracking-tight">Data status</h1>
 <p class="mt-2 text-gray-600">
   Where the data comes from, how fresh it is, what is still being collected and what could not be used.
 </p>
 
-<h2 class="mt-10 text-xl font-semibold">Feeds</h2>
-<div class="mt-3 space-y-3">
+<h2 class="mt-12 text-xl font-semibold tracking-tight">Feeds</h2>
+<div class="mt-4 space-y-3">
   <% @feeds.each do |status| %>
-    <div class="rounded border border-gray-200 p-4">
-      <div class="flex flex-wrap items-baseline gap-x-3">
+    <div class="rounded-xl border border-gray-200 p-4 shadow-sm">
+      <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
         <span class="text-lg font-medium"><%= status.name %></span>
         <%= feed_health_badge(status) %>
         <% if status.paused? %>
           <span class="text-sm text-amber-700">Paused until <%= l status.paused_until, format: :short %> UTC</span>
         <% end %>
       </div>
-      <dl class="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm text-gray-700 sm:grid-cols-4">
-        <div><dt class="text-gray-500">Last successful run</dt><dd><%= time_ago_or_never(status.last_success_at) %></dd></div>
-        <div><dt class="text-gray-500">Newest data</dt><dd><%= time_ago_or_never(status.latest_data_at) %></dd></div>
-        <div><dt class="text-gray-500">Collection progress</dt><dd><%= queue_progress(@queues, status.feed) || "—" %></dd></div>
-        <div><dt class="text-gray-500">Requests left this hour</dt><dd><%= status.remaining_quota || "—" %></dd></div>
+      <dl class="mt-3 grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-gray-900 sm:grid-cols-4">
+        <div><dt class="text-xs text-gray-500">Last successful run</dt><dd class="mt-0.5 font-medium"><%= time_ago_or_never(status.last_success_at) %></dd></div>
+        <div><dt class="text-xs text-gray-500">Newest data</dt><dd class="mt-0.5 font-medium"><%= time_ago_or_never(status.latest_data_at) %></dd></div>
+        <div><dt class="text-xs text-gray-500">Collection progress</dt><dd class="mt-0.5 font-medium tabular-nums"><%= queue_progress(@queues, status.feed) || "—" %></dd></div>
+        <div><dt class="text-xs text-gray-500">Requests left this hour</dt><dd class="mt-0.5 font-medium tabular-nums"><%= status.remaining_quota || "—" %></dd></div>
       </dl>
       <% if status.last_error.present? %>
-        <p class="mt-2 text-sm text-gray-600">Last problem (<%= time_ago_or_never(status.last_failure_at) %>): <%= status.last_error %></p>
+        <p class="mt-3 rounded-lg bg-gray-50 px-3 py-2 text-sm text-gray-600">Last problem (<%= time_ago_or_never(status.last_failure_at) %>): <%= status.last_error %></p>
       <% end %>
     </div>
   <% end %>
 </div>
 
-<h2 class="mt-10 text-xl font-semibold">Collection queue</h2>
+<h2 class="mt-12 text-xl font-semibold tracking-tight">Collection queue</h2>
 <p class="mt-1 text-sm text-gray-600">
   Each unit is one piece of work: a county and day, a checklist, a day of observations or a month of weather.
   Pending units are still to be collected; dead units failed repeatedly and were set aside.
 </p>
-<table class="mt-3 w-full text-sm">
+<div class="table-frame mt-4">
+<table class="data-table">
   <thead>
-    <tr class="border-b text-left text-gray-500"><th class="py-1">Feed</th><th>Unit</th><th>Status</th><th class="text-right">Count</th></tr>
+    <tr><th>Feed</th><th>Unit</th><th>Status</th><th class="text-right">Count</th></tr>
   </thead>
   <tbody>
     <% @queues.sort.each do |(feed, kind, status), count| %>
-      <tr class="border-b border-gray-100">
-        <td class="py-1"><%= FeedStatus::NAMES.fetch(feed, feed) %></td>
+      <tr>
+        <td><%= FeedStatus::NAMES.fetch(feed, feed) %></td>
         <td><%= kind.humanize %></td>
         <td><%= status %></td>
-        <td class="text-right"><%= number_with_delimiter(count) %></td>
+        <td class="text-right tabular-nums"><%= number_with_delimiter(count) %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+</div>
 
 <% if @dead_units.any? %>
   <h3 class="mt-6 font-semibold">Latest units set aside</h3>
-  <ul class="mt-2 space-y-1 text-sm text-gray-700">
+  <ul class="mt-2 divide-y divide-gray-200 rounded-xl border border-gray-200 text-sm text-gray-700">
     <% @dead_units.each do |unit| %>
-      <li><%= FeedStatus::NAMES.fetch(unit.feed, unit.feed) %> · <%= unit.kind.humanize %> <%= unit.key %> — <%= unit.last_error %></li>
+      <li class="px-3 py-2"><%= FeedStatus::NAMES.fetch(unit.feed, unit.feed) %> · <%= unit.kind.humanize %> <%= unit.key %> — <%= unit.last_error %></li>
     <% end %>
   </ul>
 <% end %>
 
-<h2 class="mt-10 text-xl font-semibold">What the data holds</h2>
-<table class="mt-3 w-full text-sm">
+<h2 class="mt-12 text-xl font-semibold tracking-tight">What the data holds</h2>
+<div class="table-frame mt-4">
+<table class="data-table">
   <thead>
-    <tr class="border-b text-left text-gray-500"><th class="py-1">Source</th><th>Quality</th><th class="text-right">Observations</th></tr>
+    <tr><th>Source</th><th>Quality</th><th class="text-right">Observations</th></tr>
   </thead>
   <tbody>
     <% @observations.sort.each do |(source, tier), count| %>
-      <tr class="border-b border-gray-100">
-        <td class="py-1"><%= FeedStatus::NAMES.fetch(source, source) %></td>
+      <tr>
+        <td><%= FeedStatus::NAMES.fetch(source, source) %></td>
         <td><%= tier.humanize %></td>
-        <td class="text-right"><%= number_with_delimiter(count) %></td>
+        <td class="text-right tabular-nums"><%= number_with_delimiter(count) %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+</div>
 <ul class="mt-3 space-y-1 text-sm text-gray-700">
   <% @observation_range.each do |source, first_day, last_day| %>
     <li><%= FeedStatus::NAMES.fetch(source, source) %> observations run from <%= l first_day, format: :long %> to <%= l last_day, format: :long %>.</li>
@@ -86,18 +89,18 @@
   </li>
 </ul>
 
-<h2 class="mt-10 text-xl font-semibold">eBird coverage by county</h2>
+<h2 class="mt-12 text-xl font-semibold tracking-tight">eBird coverage by county</h2>
 <p class="mt-1 text-sm text-gray-600">
   Days, out of the last 365, for which eBird's own count of checklists and observers is held. A day without that
   figure is treated as unknown, never as a day without birds.
 </p>
-<div class="mt-3 grid grid-cols-2 gap-x-6 gap-y-1 text-sm sm:grid-cols-3">
+<div class="mt-4 grid grid-cols-2 gap-x-6 text-sm sm:grid-cols-3">
   <% @coverage.each do |name, days| %>
-    <div class="flex justify-between border-b border-gray-100 py-0.5"><span><%= name %></span><span class="text-gray-600"><%= days %></span></div>
+    <div class="flex justify-between border-b border-gray-200 py-1.5"><span><%= name %></span><span class="tabular-nums text-gray-600"><%= days %></span></div>
   <% end %>
 </div>
 
-<h2 class="mt-10 text-xl font-semibold">Names that could not be matched</h2>
+<h2 class="mt-12 text-xl font-semibold tracking-tight">Names that could not be matched</h2>
 <p class="mt-1 text-sm text-gray-600">
   <%= number_with_delimiter(@unmatched_records) %> iNaturalist observations are identified only to a genus, family
   or higher group, so they cannot count toward a species. They are kept, and still count as observer effort.
@@ -106,11 +109,11 @@
   <p class="mt-2 text-sm text-gray-700"><%= @unmatched_taxa.map { |taxon| "#{taxon.source_name} (#{taxon.source_rank})" }.to_sentence %>.</p>
 <% end %>
 
-<h2 class="mt-10 text-xl font-semibold">Sources and licences</h2>
+<h2 class="mt-12 text-xl font-semibold tracking-tight">Sources and licences</h2>
 <ul class="mt-2 space-y-1 text-sm text-gray-700">
-  <li><%= link_to "eBird", "https://ebird.org", class: "text-link underline" %>, Cornell Lab of Ornithology: bird checklists, through the eBird API 2.0.</li>
-  <li><%= link_to "iNaturalist", "https://www.inaturalist.org", class: "text-link underline" %>: observations and photographs belong to their authors.</li>
-  <li><%= link_to "Open-Meteo", "https://open-meteo.com", class: "text-link underline" %>: weather data, CC BY 4.0.</li>
-  <li><%= link_to "GeoNames", "https://www.geonames.org", class: "text-link underline" %>: place names, CC BY 4.0.</li>
+  <li><%= link_to "eBird", "https://ebird.org", class: "prose-link" %>, Cornell Lab of Ornithology: bird checklists, through the eBird API 2.0.</li>
+  <li><%= link_to "iNaturalist", "https://www.inaturalist.org", class: "prose-link" %>: observations and photographs belong to their authors.</li>
+  <li><%= link_to "Open-Meteo", "https://open-meteo.com", class: "prose-link" %>: weather data, CC BY 4.0.</li>
+  <li><%= link_to "GeoNames", "https://www.geonames.org", class: "prose-link" %>: place names, CC BY 4.0.</li>
   <li>Basemap: OpenFreeMap, © OpenMapTiles, data from OpenStreetMap contributors.</li>
 </ul>

@@ -1,87 +1,92 @@
 <% content_for :title, "Flyway — did the weather move the birds?" %>
-<% content_for :main_class, "flex h-dvh flex-col" %>
+<% content_for :body_class, "h-dvh" %>
+<% content_for :main_class, "flex min-h-0 flex-1 flex-col" %>
 <% content_for :head do %>
   <%= javascript_include_tag "maplibre-gl" %>
 <% end %>
 
-<header class="flex flex-wrap items-center gap-x-6 gap-y-1 border-b border-gray-200 px-4 py-2">
-  <div>
-    <span class="text-xl font-semibold tracking-tight">Flyway</span>
-    <span class="ml-2 text-sm text-gray-600">Did the weather move the birds? Bird migration and wind in eastern Canada.</span>
-  </div>
-  <nav class="ml-auto flex flex-wrap items-center gap-x-3 text-sm">
-    <% @feeds.each do |status| %>
-      <%= link_to status_path, class: "flex items-center gap-1", title: "#{status.name}: last collected #{time_ago_or_never(status.last_success_at)}" do %>
-        <span class="inline-block size-2 rounded-full <%= feed_health_dot(status) %>"></span><%= status.name %>
-      <% end %>
-    <% end %>
-    <%= link_to "Data status", status_path, class: "text-link underline" %>
-    <%= link_to "Places", places_path, class: "text-link underline" %>
-  </nav>
-</header>
-
 <div class="flex min-h-0 flex-1 flex-col"
-     data-controller="explorer"
+     data-controller="explorer panel"
      data-explorer-activity-url-value="<%= map_activity_path %>"
      data-explorer-wind-url-value="<%= map_wind_path %>"
      data-explorer-sites-value="<%= @sites.to_json %>">
-  <div class="flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-gray-200 px-4 py-2 text-sm">
-    <div class="flex items-center gap-1" role="group" aria-label="Species group">
+  <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-gray-200 px-4 py-2 text-sm">
+    <div class="flex items-center gap-2" role="group" aria-label="Species group">
       <span class="text-gray-500">Show</span>
-      <button type="button" class="explorer-choice" data-explorer-target="group" data-action="explorer#chooseGroup" data-group="all" aria-pressed="true">All birds</button>
-      <% @groups.each do |key, name| %>
-        <button type="button" class="explorer-choice" data-explorer-target="group" data-action="explorer#chooseGroup" data-group="<%= key %>" aria-pressed="false"><%= name %></button>
-      <% end %>
+      <div class="segmented">
+        <button type="button" class="explorer-choice" data-explorer-target="group" data-action="explorer#chooseGroup" data-group="all" aria-pressed="true">All birds</button>
+        <% @groups.each do |key, name| %>
+          <button type="button" class="explorer-choice" data-explorer-target="group" data-action="explorer#chooseGroup" data-group="<%= key %>" aria-pressed="false"><%= name %></button>
+        <% end %>
+      </div>
     </div>
-    <div class="flex items-center gap-1" role="group" aria-label="Data source">
+    <div class="flex items-center gap-2" role="group" aria-label="Data source">
       <span class="text-gray-500">From</span>
-      <%# iNaturalist first: it covers the whole region and year evenly, while eBird is only collected for the counties of featured sites. %>
-      <% { "inaturalist" => "iNaturalist", "ebird" => "eBird (site counties)", "both" => "Both" }.each do |key, name| %>
-        <button type="button" class="explorer-choice" data-explorer-target="source" data-action="explorer#chooseSource" data-source="<%= key %>" aria-pressed="<%= key == "inaturalist" %>"><%= name %></button>
-      <% end %>
+      <div class="segmented">
+        <%# iNaturalist first: it covers the whole region and year evenly, while eBird is only collected for the counties of featured sites. %>
+        <% { "inaturalist" => "iNaturalist", "ebird" => "eBird (site counties)", "both" => "Both" }.each do |key, name| %>
+          <button type="button" class="explorer-choice" data-explorer-target="source" data-action="explorer#chooseSource" data-source="<%= key %>" aria-pressed="<%= key == "inaturalist" %>"><%= name %></button>
+        <% end %>
+      </div>
     </div>
-    <div class="flex items-center gap-1" role="group" aria-label="Zoom to">
+    <div class="flex items-center gap-2" role="group" aria-label="Zoom to">
       <span class="text-gray-500">Zoom to</span>
-      <% HomeController::PROVINCE_VIEWS.each do |view| %>
-        <button type="button" class="explorer-choice" data-action="explorer#zoomTo" data-bounds="<%= view[:bounds].to_json %>"><%= view[:name] %></button>
-      <% end %>
+      <div class="segmented">
+        <% HomeController::PROVINCE_VIEWS.each do |view| %>
+          <button type="button" class="explorer-choice" data-action="explorer#zoomTo" data-bounds="<%= view[:bounds].to_json %>"><%= view[:name] %></button>
+        <% end %>
+      </div>
     </div>
   </div>
 
   <div class="flex min-h-0 flex-1 flex-col lg:flex-row">
-  <div class="flex min-h-0 min-w-0 flex-1 flex-col">
+  <div class="relative flex min-h-0 min-w-0 flex-1 flex-col">
+  <%# Tab on the edge next to the question panel: on its left on wide screens, above it on narrow ones. %>
+  <button type="button" class="panel-tab group" title="Show or hide the questions" aria-label="Questions panel"
+          aria-controls="ask-panel" aria-expanded="true" data-panel-target="toggle" data-action="panel#toggle">
+    <svg viewBox="0 0 16 16" class="size-4 transition-transform max-lg:rotate-90 max-lg:group-aria-expanded:-rotate-90 lg:group-aria-expanded:rotate-180" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg>
+  </button>
   <div class="relative min-h-64 flex-1">
     <div data-explorer-target="map" class="h-full w-full"></div>
-    <div class="absolute left-3 top-3 max-w-xs rounded bg-surface/95 p-3 text-xs text-gray-700 shadow">
+    <div class="absolute left-3 top-3 max-w-xs rounded-xl border border-gray-200 bg-surface/90 p-3 text-xs leading-relaxed text-gray-700 shadow-sm backdrop-blur">
       <p class="font-medium text-gray-900" data-explorer-target="legendTitle">Loading a year of observations…</p>
-      <div class="mt-2 h-2 w-full rounded" data-explorer-target="legendRamp"></div>
-      <div class="mt-0.5 flex justify-between text-gray-500"><span data-explorer-target="legendLow"></span><span data-explorer-target="legendHigh"></span></div>
-      <ul class="mt-2 space-y-1">
-        <li><span class="mr-1 inline-block size-3 border border-gray-400 bg-gray-300 align-middle"></span>Grey cell: fewer than 5 bird records, too few to tell.</li>
+      <div class="mt-2 h-2 w-full rounded-full" data-explorer-target="legendRamp"></div>
+      <div class="mt-1 flex justify-between tabular-nums text-gray-500"><span data-explorer-target="legendLow"></span><span data-explorer-target="legendHigh"></span></div>
+      <ul class="mt-2.5 space-y-1 border-t border-gray-200 pt-2.5">
+        <li><span class="mr-1 inline-block size-3 rounded-sm border border-gray-400 bg-gray-300 align-middle"></span>Grey cell: fewer than 5 bird records, too few to tell.</li>
         <li>No cell: nobody reported a bird there. That is not the same as no birds.</li>
         <li>Arrows: wind about 750 m up during the previous night, pointing where the air is going. Most songbirds migrate at night at that height.</li>
       </ul>
     </div>
   </div>
 
-  <div class="border-t border-gray-200 px-4 pb-3 pt-2">
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-      <button type="button" class="rounded bg-blue-700 px-3 py-1 font-medium text-white" data-explorer-target="play" data-action="explorer#togglePlay">Play</button>
-      <span class="font-medium" data-explorer-target="date"></span>
-      <span class="text-gray-600" data-explorer-target="summary"></span>
-      <div class="ml-auto flex items-center gap-1" role="group" aria-label="Time window">
+  <div class="border-t border-gray-200 px-4 pb-6 pt-2 lg:pb-3">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
+      <%# The explorer marks the button data-playing while the timeline runs; the icon follows. %>
+      <button type="button" class="group grid size-9 shrink-0 place-items-center rounded-full bg-blue-700 text-white shadow-sm transition-colors hover:bg-blue-800"
+              aria-label="Play" title="Play" data-explorer-target="play" data-action="explorer#togglePlay">
+        <svg viewBox="0 0 16 16" class="ml-0.5 size-4 group-data-playing:hidden" fill="currentColor" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.2-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>
+        <svg viewBox="0 0 16 16" class="hidden size-4 group-data-playing:block" fill="currentColor" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg>
+      </button>
+      <div class="min-w-0">
+        <p class="font-medium tabular-nums" data-explorer-target="date"></p>
+        <p class="text-xs text-gray-600" data-explorer-target="summary"></p>
+      </div>
+      <div class="ml-auto flex items-center gap-2" role="group" aria-label="Time window">
         <span class="text-gray-500">Each step shows</span>
-        <button type="button" class="explorer-choice" data-explorer-target="window" data-action="explorer#chooseWindow" data-window="1" aria-pressed="false">1 day</button>
-        <button type="button" class="explorer-choice" data-explorer-target="window" data-action="explorer#chooseWindow" data-window="7" aria-pressed="true">7 days</button>
+        <div class="segmented">
+          <button type="button" class="explorer-choice" data-explorer-target="window" data-action="explorer#chooseWindow" data-window="1" aria-pressed="false">1 day</button>
+          <button type="button" class="explorer-choice" data-explorer-target="window" data-action="explorer#chooseWindow" data-window="7" aria-pressed="true">7 days</button>
+        </div>
       </div>
     </div>
-    <div class="relative mt-2">
+    <div class="relative mt-3">
       <svg data-explorer-target="chart" class="block h-16 w-full" preserveAspectRatio="none" role="img" aria-label="Activity over the last twelve months"></svg>
       <input type="range" min="0" max="365" value="365" step="1" class="explorer-slider" aria-label="Date"
              data-explorer-target="slider" data-action="input->explorer#scrub">
       <div class="relative h-4 text-xs text-gray-500" data-explorer-target="months"></div>
     </div>
-    <p class="mt-1 text-xs text-gray-500">
+    <p class="mt-2 text-xs leading-relaxed text-gray-500">
       Bars: <span data-explorer-target="chartNote"></span>
       Strip below the bars: night wind over the whole region, green when it pushes birds along their seasonal direction
       (south in fall, north in spring), red when it holds them back.
@@ -89,43 +94,61 @@
   </div>
   </div>
 
-  <aside class="max-h-[45dvh] overflow-y-auto border-t border-gray-200 p-4 lg:max-h-none lg:w-[26rem] lg:border-l lg:border-t-0"
-         data-controller="ask">
-    <h2 class="text-lg font-semibold">Ask a question</h2>
-    <p class="mt-1 text-sm text-gray-600">
-      Answers are written from the observations and weather shown here, with the figures and sources behind them.
-    </p>
+  <aside id="ask-panel" class="flex max-h-[45dvh] min-h-0 flex-col border-t border-gray-200 lg:max-h-none lg:w-[26rem] lg:border-l lg:border-t-0"
+         data-controller="ask" data-panel-target="panel">
+    <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-4">
+      <h2 class="text-base font-semibold tracking-tight">Ask a question</h2>
+      <p class="mt-1 text-sm text-gray-600">
+        Answers are written from the observations and weather shown here, with the figures and sources behind them.
+      </p>
 
-    <%= form_with url: answers_path, data: { turbo_frame: "answer", ask_target: "form", action: "turbo:submit-start->ask#start turbo:submit-end->ask#finish" }, class: "mt-3" do |form| %>
-      <%= form.text_area :question, rows: 2, maxlength: AnswersController::MAX_QUESTION_LENGTH, required: true,
-            placeholder: "Did last night's winds bring more warblers to Tadoussac?", aria: { label: "Your question" },
-            data: { ask_target: "question", action: "keydown.enter->ask#submitOnEnter" },
-            class: "w-full rounded border border-gray-300 px-3 py-2 text-sm" %>
-      <%= form.submit "Ask", name: nil, data: { ask_target: "submit" }, class: "mt-1 rounded bg-blue-700 px-4 py-1.5 text-sm font-medium text-white disabled:opacity-50" %>
-      <span class="ml-2 hidden text-sm text-gray-600" data-ask-target="waiting">Reading the data…</span>
+      <div class="mt-4 hidden" role="status" data-ask-target="waiting">
+        <p class="flex items-center gap-2 text-sm text-gray-600">
+          <span class="size-2 animate-pulse rounded-full bg-blue-700"></span>Reading the data…
+        </p>
+        <div class="mt-3 animate-pulse space-y-2">
+          <div class="h-3 rounded bg-gray-200"></div>
+          <div class="h-3 w-11/12 rounded bg-gray-200"></div>
+          <div class="h-3 w-2/3 rounded bg-gray-200"></div>
+        </div>
+      </div>
+
+      <%= turbo_frame_tag "answer", data: { ask_target: "answer" } %>
+
+      <p class="mt-6 text-xs font-semibold uppercase tracking-wide text-gray-500">Try one</p>
+      <ul class="mt-2 space-y-1.5">
+        <% AgentAnswer::SUGGESTED.each do |question| %>
+          <li><button type="button" class="w-full rounded-xl border border-gray-200 px-3 py-2 text-left text-sm text-gray-700 transition-colors hover:border-gray-300 hover:bg-gray-50" data-action="ask#suggest"><%= question %></button></li>
+        <% end %>
+      </ul>
+
+      <details class="mt-6 rounded-xl border border-gray-200 text-sm text-gray-700">
+        <summary class="cursor-pointer px-3 py-2 font-medium text-gray-900">What do these words mean?</summary>
+        <dl class="space-y-2 border-t border-gray-200 px-3 py-3">
+          <div><dt class="font-medium">Checklist</dt><dd>The list of birds one observer or group reported to eBird for one outing, with its duration and distance.</dd></div>
+          <div><dt class="font-medium">Complete checklist</dt><dd>A checklist where the observer reported every species detected. Only then does a missing species mean it was looked for and not found.</dd></div>
+          <div><dt class="font-medium">Reporting rate</dt><dd>The share of complete checklists on which a species or group appears. It does not grow just because more people were out.</dd></div>
+          <div><dt class="font-medium">Research grade</dt><dd>An iNaturalist observation whose identification was confirmed by other members.</dd></div>
+          <div><dt class="font-medium">Tailwind</dt><dd>Wind blowing in the direction the birds are travelling: south in fall, north in spring. A headwind blows against them.</dd></div>
+          <div><dt class="font-medium">925 hPa</dt><dd>A pressure level about 750 m above the ground, the height at which most songbirds migrate at night.</dd></div>
+          <div><dt class="font-medium">Confidence</dt><dd>Computed from the data, not chosen by the language model: it drops when records are few, recent days are still filling up, or the weather is a forecast.</dd></div>
+        </dl>
+      </details>
+    </div>
+
+    <%= form_with url: answers_path, data: { turbo_frame: "answer", ask_target: "form", action: "turbo:submit-start->ask#start turbo:submit-end->ask#finish" }, class: "border-t border-gray-200 p-3" do |form| %>
+      <div class="flex items-end gap-2 rounded-2xl border border-gray-300 py-1.5 pl-3.5 pr-1.5 shadow-sm transition focus-within:border-blue-700 focus-within:ring-2 focus-within:ring-blue-700/20">
+        <%= form.text_area :question, rows: 2, maxlength: AnswersController::MAX_QUESTION_LENGTH, required: true,
+              placeholder: "Did last night's winds bring more warblers to Tadoussac?", aria: { label: "Your question" },
+              data: { ask_target: "question", action: "keydown.enter->ask#submitOnEnter" },
+              class: "min-w-0 flex-1 resize-none bg-transparent py-1.5 text-sm outline-none placeholder:text-gray-400" %>
+        <%= form.button type: :submit, name: nil, title: "Ask", aria: { label: "Ask" }, data: { ask_target: "submit" },
+              class: "grid size-8 shrink-0 place-items-center rounded-full bg-blue-700 text-white transition-colors hover:bg-blue-800 disabled:opacity-40" do %>
+          <svg viewBox="0 0 16 16" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5"/></svg>
+        <% end %>
+      </div>
+      <p class="mt-1.5 px-1 text-xs text-gray-500">Enter to send, Shift+Enter for a new line.</p>
     <% end %>
-
-    <p class="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">Try one</p>
-    <ul class="mt-1 space-y-1">
-      <% AgentAnswer::SUGGESTED.each do |question| %>
-        <li><button type="button" class="text-left text-sm text-link underline" data-action="ask#suggest"><%= question %></button></li>
-      <% end %>
-    </ul>
-
-    <%= turbo_frame_tag "answer" %>
-
-    <details class="mt-6 text-sm text-gray-700">
-      <summary class="cursor-pointer font-medium text-gray-900">What do these words mean?</summary>
-      <dl class="mt-2 space-y-2">
-        <div><dt class="font-medium">Checklist</dt><dd>The list of birds one observer or group reported to eBird for one outing, with its duration and distance.</dd></div>
-        <div><dt class="font-medium">Complete checklist</dt><dd>A checklist where the observer reported every species detected. Only then does a missing species mean it was looked for and not found.</dd></div>
-        <div><dt class="font-medium">Reporting rate</dt><dd>The share of complete checklists on which a species or group appears. It does not grow just because more people were out.</dd></div>
-        <div><dt class="font-medium">Research grade</dt><dd>An iNaturalist observation whose identification was confirmed by other members.</dd></div>
-        <div><dt class="font-medium">Tailwind</dt><dd>Wind blowing in the direction the birds are travelling: south in fall, north in spring. A headwind blows against them.</dd></div>
-        <div><dt class="font-medium">925 hPa</dt><dd>A pressure level about 750 m above the ground, the height at which most songbirds migrate at night.</dd></div>
-        <div><dt class="font-medium">Confidence</dt><dd>Computed from the data, not chosen by the language model: it drops when records are few, recent days are still filling up, or the weather is a forecast.</dd></div>
-      </dl>
-    </details>
   </aside>
   </div>
 </div>

@@ -1,9 +1,9 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The question form: suggested questions, Enter to send, and a waiting
-// state while the answer is being written.
+// The question form: suggested questions, Enter to send, and a placeholder
+// shown in place of the answer while it is being written.
 export default class extends Controller {
-  static targets = ["form", "question", "submit", "waiting"]
+  static targets = ["form", "question", "submit", "waiting", "answer"]
 
   suggest(event) {
     this.questionTarget.value = event.currentTarget.textContent.trim()
@@ -19,11 +19,14 @@ export default class extends Controller {
 
   start() {
     this.submitTarget.disabled = true
+    this.answerTarget.classList.add("hidden")
     this.waitingTarget.classList.remove("hidden")
+    this.waitingTarget.scrollIntoView({ block: "nearest" })
   }
 
   finish() {
     this.submitTarget.disabled = false
     this.waitingTarget.classList.add("hidden")
+    this.answerTarget.classList.remove("hidden")
   }
 }

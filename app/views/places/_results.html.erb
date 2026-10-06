@@ -1,4 +1,4 @@
-<p class="mt-8 font-medium"><%= place_status_message(result) %></p>
+<p class="mt-10 font-medium"><%= place_status_message(result) %></p>
 <% if result.province %>
   <p class="text-sm text-gray-500">Limited to <%= result.province.delete_prefix("CA-") %>, as named in the search.</p>
 <% end %>

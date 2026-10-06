@@ -400,7 +400,7 @@ export default class extends Controller {
       const date = this.dateAt(day, cube)
       if (date.getUTCDate() !== 1) continue
       const left = ((day / cube.day_count) * 100).toFixed(2)
-      labels.push(`<span class="absolute border-l border-gray-300 pl-1" style="left:${left}%">${MONTHS[date.getUTCMonth()]}</span>`)
+      labels.push(`<span class="absolute border-l border-gray-300 pl-1 leading-none" style="left:${left}%">${MONTHS[date.getUTCMonth()]}</span>`)
     }
     this.monthsTarget.innerHTML = labels.join("")
   }
@@ -456,7 +456,7 @@ export default class extends Controller {
 
   play() {
     if (this.day >= this.cube.day_count - 1) this.day = 0
-    this.playTarget.textContent = "Pause"
+    this.showPlaying(true)
     this.timer = setInterval(() => {
       if (this.day >= this.cube.day_count - 1) return this.stop()
       this.day++
@@ -468,7 +468,13 @@ export default class extends Controller {
   stop() {
     clearInterval(this.timer)
     this.timer = null
-    if (this.hasPlayTarget) this.playTarget.textContent = "Play"
+    if (this.hasPlayTarget) this.showPlaying(false)
+  }
+
+  // The play button draws a play or a pause icon from data-playing.
+  showPlaying(playing) {
+    this.playTarget.toggleAttribute("data-playing", playing)
+    this.playTarget.ariaLabel = this.playTarget.title = playing ? "Pause" : "Play"
   }
 
   // --- helpers --------------------------------------------------------------

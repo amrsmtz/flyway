@@ -5,7 +5,7 @@ module AnswersHelper
 
   def confidence_badge(answer)
     tag.span("#{answer.confidence.capitalize} confidence",
-             class: "rounded px-2 py-0.5 text-sm font-medium #{CONFIDENCE_CLASSES.fetch(answer.confidence)}")
+             class: "rounded-full px-2.5 py-0.5 text-xs font-medium #{CONFIDENCE_CLASSES.fetch(answer.confidence)}")
   end
 
   # "eBird collected 12 minutes ago"
