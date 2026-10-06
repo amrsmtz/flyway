@@ -15,8 +15,8 @@
         <span class="inline-block size-2 rounded-full <%= feed_health_dot(status) %>"></span><%= status.name %>
       <% end %>
     <% end %>
-    <%= link_to "Data status", status_path, class: "text-blue-700 underline" %>
-    <%= link_to "Places", places_path, class: "text-blue-700 underline" %>
+    <%= link_to "Data status", status_path, class: "text-link underline" %>
+    <%= link_to "Places", places_path, class: "text-link underline" %>
   </nav>
 </header>
 
@@ -52,7 +52,7 @@
   <div class="flex min-h-0 min-w-0 flex-1 flex-col">
   <div class="relative min-h-64 flex-1">
     <div data-explorer-target="map" class="h-full w-full"></div>
-    <div class="absolute left-3 top-3 max-w-xs rounded bg-white/95 p-3 text-xs text-gray-700 shadow">
+    <div class="absolute left-3 top-3 max-w-xs rounded bg-surface/95 p-3 text-xs text-gray-700 shadow">
       <p class="font-medium text-gray-900" data-explorer-target="legendTitle">Loading a year of observations…</p>
       <div class="mt-2 h-2 w-full rounded" data-explorer-target="legendRamp"></div>
       <div class="mt-0.5 flex justify-between text-gray-500"><span data-explorer-target="legendLow"></span><span data-explorer-target="legendHigh"></span></div>
@@ -108,7 +108,7 @@
     <p class="mt-4 text-xs font-semibold uppercase tracking-wide text-gray-500">Try one</p>
     <ul class="mt-1 space-y-1">
       <% AgentAnswer::SUGGESTED.each do |question| %>
-        <li><button type="button" class="text-left text-sm text-blue-700 underline" data-action="ask#suggest"><%= question %></button></li>
+        <li><button type="button" class="text-left text-sm text-link underline" data-action="ask#suggest"><%= question %></button></li>
       <% end %>
     </ul>
 

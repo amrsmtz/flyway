@@ -19,7 +19,7 @@
               <%= figure["text"] %>
               <% figure["evidence"].to_a.each do |key| %>
                 <%= link_to "[#{key}]", answer_evidence_path(answer, key), target: "_blank", rel: "noopener",
-                      class: "text-blue-700 underline", title: answer.evidence_set(key)&.dig("title") %>
+                      class: "text-link underline", title: answer.evidence_set(key)&.dig("title") %>
               <% end %>
             </li>
           <% end %>
@@ -49,7 +49,7 @@
         <ul class="mt-1 space-y-0.5">
           <% answer.evidence.each do |set| %>
             <li>
-              <%= link_to "[#{set["key"]}]", answer_evidence_path(answer, set["key"]), target: "_blank", rel: "noopener", class: "text-blue-700 underline" %>
+              <%= link_to "[#{set["key"]}]", answer_evidence_path(answer, set["key"]), target: "_blank", rel: "noopener", class: "text-link underline" %>
               <%= set["title"] %> <span class="text-gray-500">· <%= set["source"] %></span>
             </li>
           <% end %>

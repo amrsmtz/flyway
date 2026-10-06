@@ -7,13 +7,21 @@ import { Controller } from "@hotwired/stimulus"
 // timeline only re-sums a few small arrays and updates map feature states,
 // with no request, which is what keeps it smooth.
 
-const BASEMAP = "https://tiles.openfreemap.org/styles/positron"
-// Used when the basemap cannot be reached (some networks block it): the
-// data still shows, on a plain background.
-const PLAIN_STYLE = {
-  version: 8, sources: {},
-  layers: [{ id: "background", type: "background", paint: { "background-color": "#eef1f4" } }]
+// Colours of everything drawn on the map and chart, for the browser's light
+// and dark settings. The ramp always runs from "blends into the basemap" to
+// "stands out": yellow to purple on a pale map, purple to yellow on a dark one.
+const VIRIDIS = ["#fde725", "#7ad151", "#22a884", "#2a788e", "#414487", "#440154"]
+const THEMES = {
+  light: {
+    basemap: "https://tiles.openfreemap.org/styles/positron", background: "#eef1f4", ramp: VIRIDIS,
+    fewRecords: "#9ca3af", ink: "#1f2937", paper: "#ffffff", bars: "#6b7280"
+  },
+  dark: {
+    basemap: "https://tiles.openfreemap.org/styles/dark", background: "#0f172a", ramp: VIRIDIS.toReversed(),
+    fewRecords: "#6b7280", ink: "#e5e7eb", paper: "#111827", bars: "#9ca3af"
+  }
 }
+const DARK_QUERY = "(prefers-color-scheme: dark)"
 const BASEMAP_TIMEOUT_MS = 5000
 // Below this many bird records a cell's share of a group means nothing.
 const MIN_RECORDS = 5
@@ -24,8 +32,6 @@ const SHARE_SCALE = { warblers: 0.3, snow_goose: 0.1, raptors: 0.15 }
 // Record count per day of window at which "all birds" saturates. The scale
 // is logarithmic: a few cells near cities hold most of the records.
 const COUNT_SCALE = 100
-// Light yellow to dark purple; readable on a pale basemap.
-const RAMP = ["#fde725", "#7ad151", "#22a884", "#2a788e", "#414487", "#440154"]
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 const FRAME_MS = 110
 
@@ -40,7 +46,13 @@ export default class extends Controller {
     this.windowDays = 7
     this.cubes = {}
     this.activeCells = new Set()
-    this.legendRampTarget.style.background = `linear-gradient(to right, ${RAMP.join(",")})`
+    // The map is drawn once with the theme found on arrival; if the
+    // browser's setting changes, the page reloads to redraw it.
+    this.darkQuery = window.matchMedia(DARK_QUERY)
+    this.theme = THEMES[this.darkQuery.matches ? "dark" : "light"]
+    this.themeChanged = () => window.location.reload()
+    this.darkQuery.addEventListener("change", this.themeChanged)
+    this.legendRampTarget.style.background = `linear-gradient(to right, ${this.theme.ramp.join(",")})`
 
     this.createMap()
   }
@@ -64,17 +76,24 @@ export default class extends Controller {
     this.map.on("load", () => this.start())
   }
 
-  // The basemap style, or the plain one when it does not answer in time.
+  // The basemap style, or a plain background when it does not answer in
+  // time (some networks block it): the data still shows.
   async basemapStyle() {
+    const plain = {
+      version: 8, sources: {},
+      layers: [{ id: "background", type: "background", paint: { "background-color": this.theme.background } }]
+    }
+
     try {
-      const response = await fetch(BASEMAP, { signal: AbortSignal.timeout(BASEMAP_TIMEOUT_MS) })
-      return response.ok ? await response.json() : PLAIN_STYLE
+      const response = await fetch(this.theme.basemap, { signal: AbortSignal.timeout(BASEMAP_TIMEOUT_MS) })
+      return response.ok ? await response.json() : plain
     } catch (error) {
-      return PLAIN_STYLE
+      return plain
     }
   }
 
   disconnect() {
+    this.darkQuery.removeEventListener("change", this.themeChanged)
     this.stop()
     this.map?.remove()
   }
@@ -167,8 +186,9 @@ export default class extends Controller {
       paint: {
         // kind: 1 = too few records, 2 = coloured by value; absent = no records.
         "fill-color": ["case", ["==", state("kind"), 2],
-          ["interpolate", ["linear"], ["coalesce", state("value"), 0], ...RAMP.flatMap((color, i) => [i / (RAMP.length - 1), color])],
-          "#9ca3af"],
+          ["interpolate", ["linear"], ["coalesce", state("value"), 0],
+            ...this.theme.ramp.flatMap((color, i) => [i / (this.theme.ramp.length - 1), color])],
+          this.theme.fewRecords],
         "fill-opacity": ["case", ["==", state("kind"), 2], 0.72, ["==", state("kind"), 1], 0.35, 0],
         "fill-outline-color": "rgba(0,0,0,0)"
       }
@@ -198,14 +218,14 @@ export default class extends Controller {
     })
     this.map.addLayer({
       id: "sites", type: "circle", source: "sites",
-      paint: { "circle-radius": 5, "circle-color": "#ffffff", "circle-stroke-color": "#111827", "circle-stroke-width": 2 }
+      paint: { "circle-radius": 5, "circle-color": this.theme.paper, "circle-stroke-color": this.theme.ink, "circle-stroke-width": 2 }
     })
     // Text needs the basemap's fonts.
     if (this.hasLabels) {
       this.map.addLayer({
         id: "site-labels", type: "symbol", source: "sites", minzoom: 5.5,
         layout: { "text-field": ["get", "name"], "text-size": 12, "text-offset": [0, 1.1], "text-anchor": "top", "text-font": ["Noto Sans Regular"] },
-        paint: { "text-halo-color": "#ffffff", "text-halo-width": 1.5 }
+        paint: { "text-color": this.theme.ink, "text-halo-color": this.theme.paper, "text-halo-width": 1.5 }
       })
     }
     this.map.on("click", "sites", (event) => {
@@ -225,7 +245,7 @@ export default class extends Controller {
     const canvas = document.createElement("canvas")
     canvas.width = canvas.height = size
     const context = canvas.getContext("2d")
-    context.strokeStyle = context.fillStyle = "#1f2937"
+    context.strokeStyle = context.fillStyle = this.theme.ink
     context.lineWidth = 4
     context.lineCap = "round"
     context.beginPath()
@@ -336,7 +356,7 @@ export default class extends Controller {
     const max = Math.max(...heights, 0.0001)
     const bars = heights.map((height, day) => {
       const h = (height / max) * 50
-      return `<rect x="${day}" y="${50 - h}" width="0.9" height="${h}" fill="#6b7280"/>`
+      return `<rect x="${day}" y="${50 - h}" width="0.9" height="${h}" fill="${this.theme.bars}"/>`
     })
     const strip = this.tailwinds().map((tailwind, day) => {
       if (tailwind === null) return ""

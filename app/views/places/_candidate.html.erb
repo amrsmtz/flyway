@@ -4,7 +4,7 @@
     <span class="text-lg font-medium"><%= place.name %></span>
     <span class="text-sm text-gray-600"><%= place_kind_label(place) %><%= " · #{place.province_code.delete_prefix("CA-")}" if place.province_code %></span>
     <% if candidate == best %>
-      <span class="text-sm font-medium text-blue-700">Used by default</span>
+      <span class="text-sm font-medium text-link">Used by default</span>
     <% end %>
   </div>
 
@@ -20,6 +20,6 @@
   <% end %>
 
   <% if (url = place_ebird_url(place)) %>
-    <p class="mt-1 text-sm"><%= link_to "View on eBird", url, target: "_blank", rel: "noopener", class: "text-blue-700 underline" %></p>
+    <p class="mt-1 text-sm"><%= link_to "View on eBird", url, target: "_blank", rel: "noopener", class: "text-link underline" %></p>
   <% end %>
 </li>

@@ -1,6 +1,6 @@
 <% content_for :title, "#{@evidence["key"]}: #{@evidence["title"]} — Flyway" %>
 
-<p class="text-sm"><%= link_to "← Back to the answer", answer_path(@answer), class: "text-blue-700 underline" %></p>
+<p class="text-sm"><%= link_to "← Back to the answer", answer_path(@answer), class: "text-link underline" %></p>
 <p class="mt-4 text-sm font-medium text-gray-500">Evidence <%= @evidence["key"] %> · <%= @evidence["source"] %></p>
 <h1 class="mt-1 text-2xl font-semibold tracking-tight"><%= @evidence["title"] %></h1>
 <p class="mt-2 text-gray-600">For the question: “<%= @answer.question %>”</p>
@@ -29,7 +29,7 @@
           <td class="py-1 pr-3"><%= record["label"] %></td>
           <td class="pr-3 whitespace-nowrap"><%= record["date"] %></td>
           <td class="pr-3 text-gray-700"><%= record["detail"] %></td>
-          <td><%= link_to "Open original", record["url"], target: "_blank", rel: "noopener", class: "text-blue-700 underline" if record["url"] %></td>
+          <td><%= link_to "Open original", record["url"], target: "_blank", rel: "noopener", class: "text-link underline" if record["url"] %></td>
         </tr>
       <% end %>
     </tbody>
