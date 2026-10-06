@@ -26,7 +26,10 @@ module Flyway
     # These settings can be overridden in specific environments using the files
     # in config/environments, which are processed later.
     #
-    # config.time_zone = "Central Time (US & Canada)"
+    # "Today", "last night" and "this week" are read in Eastern time, where
+    # most of the region lives. With the default (UTC) the app moved to the
+    # next day at 8 p.m. local time. Timestamps are still stored in UTC.
+    config.time_zone = "America/Toronto"
     # config.eager_load_paths << Rails.root.join("extras")
   end
 end
