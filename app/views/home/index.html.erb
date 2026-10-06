@@ -35,7 +35,7 @@
       <span class="text-gray-500">Zoom to</span>
       <div class="segmented max-sm:flex-nowrap">
         <% HomeController::PROVINCE_VIEWS.each do |view| %>
-          <button type="button" class="explorer-choice" data-action="explorer#zoomTo" data-bounds="<%= view[:bounds].to_json %>"><%= view[:name] %></button>
+          <button type="button" class="explorer-choice" data-explorer-target="view" data-action="explorer#zoomTo" data-bounds="<%= view[:bounds].to_json %>" aria-pressed="<%= view[:name] == "All" %>"><%= view[:name] %></button>
         <% end %>
       </div>
     </div>

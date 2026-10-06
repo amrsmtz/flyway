@@ -38,7 +38,7 @@ const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 const FRAME_MS = 110
 
 export default class extends Controller {
-  static targets = ["map", "group", "source", "window", "slider", "chart", "months", "date", "summary", "play",
+  static targets = ["map", "group", "source", "window", "view", "slider", "chart", "months", "date", "summary", "play",
                     "legendTitle", "legendRamp", "legendLow", "legendHigh", "legendNotes", "chartNote"]
   static values = { activityUrl: String, windUrl: String, sites: Array }
 
@@ -429,6 +429,7 @@ export default class extends Controller {
   }
 
   zoomTo(event) {
+    this.press(this.viewTargets, event.currentTarget)
     this.map.fitBounds(JSON.parse(event.currentTarget.dataset.bounds), { padding: 20 })
   }
 
