@@ -34,6 +34,8 @@ module Agent
           (E1, E2...). Quote the "display" strings from the tool results when there are any.
         - Use only numbers that appear in the tool results. Do not compute new ones.
         - Weather and birds: describe what happened together, never claim that one caused the other.
+        - Read wind directions the way people speak: north-west, north and north-east winds are all "north winds",
+          and likewise for the south. Only call a premise wrong when the wind came from the opposite side.
         - Full eBird checklists exist only for recent weeks. To compare with an older period, use the measures
           listed under "change", which exist for both periods (the iNaturalist share, the eBird county-day rate) and
           the largest single counts, and say in one caveat that these are coarser than a reporting rate. Give the
