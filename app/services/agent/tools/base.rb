@@ -26,6 +26,11 @@ module Agent
         @run.record(tool: name, arguments: arguments, result: result, place: understood_as(resolution))
       rescue ArgumentError, Date::Error => e
         @run.record_error(tool: name, arguments: arguments, message: "Invalid request: #{e.message}")
+      rescue StandardError => e
+        # A bug in one analysis must not take the whole answer down: the
+        # model is told the tool failed and answers with the others.
+        Rails.error.report(e, handled: true, context: { tool: name, arguments: arguments })
+        @run.record_error(tool: name, arguments: arguments, message: "This analysis failed and returned nothing.")
       end
 
       private

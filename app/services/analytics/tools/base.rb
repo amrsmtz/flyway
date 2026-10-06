@@ -40,6 +40,8 @@ module Analytics
       # between two shares larger than chance alone would often produce?
       def clear_difference?(part_a, whole_a, part_b, whole_b)
         return false if whole_a.zero? || whole_b.zero?
+        # A part larger than its whole is not a share; refuse to test it.
+        return false if part_a > whole_a || part_b > whole_b
 
         pooled = (part_a + part_b).to_f / (whole_a + whole_b)
         spread = Math.sqrt(pooled * (1 - pooled) * (1.0 / whole_a + 1.0 / whole_b))

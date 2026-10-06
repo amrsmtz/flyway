@@ -86,7 +86,11 @@ module Analytics
 
         # Coarser than a reporting rate, but available for the whole year:
         # on how many county-days with effort was the group reported at all?
-        detected = scope.distinct.count(Arel.sql("(county_code, observed_on)"))
+        # Counted over the same counties and days as the effort figures: an
+        # area cut by a rectangle or a radius also holds records from
+        # neighbouring counties, which have no denominator here.
+        detected = scope.where(county_code: codes, observed_on: effort.select(:day))
+                        .distinct.count(Arel.sql("(county_code, observed_on)"))
         figures.merge(county_days_group_detected: detected,
                       county_day_rate_percent: percent(detected, figures[:county_days_with_figures]),
                       display: share_display(detected, figures[:county_days_with_figures], "county-days with eBird checklists"),
