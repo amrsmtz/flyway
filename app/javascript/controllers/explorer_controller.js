@@ -22,6 +22,8 @@ const THEMES = {
   }
 }
 const DARK_QUERY = "(prefers-color-scheme: dark)"
+// Width under which the legend's notes start folded, to leave the map visible.
+const NARROW_QUERY = "(max-width: 639px)"
 const BASEMAP_TIMEOUT_MS = 5000
 // Below this many bird records a cell's share of a group means nothing.
 const MIN_RECORDS = 5
@@ -37,7 +39,7 @@ const FRAME_MS = 110
 
 export default class extends Controller {
   static targets = ["map", "group", "source", "window", "slider", "chart", "months", "date", "summary", "play",
-                    "legendTitle", "legendRamp", "legendLow", "legendHigh", "chartNote"]
+                    "legendTitle", "legendRamp", "legendLow", "legendHigh", "legendNotes", "chartNote"]
   static values = { activityUrl: String, windUrl: String, sites: Array }
 
   connect() {
@@ -53,6 +55,7 @@ export default class extends Controller {
     this.themeChanged = () => window.location.reload()
     this.darkQuery.addEventListener("change", this.themeChanged)
     this.legendRampTarget.style.background = `linear-gradient(to right, ${this.theme.ramp.join(",")})`
+    this.legendNotesTarget.open = !window.matchMedia(NARROW_QUERY).matches
 
     this.createMap()
   }

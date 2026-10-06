@@ -1,6 +1,6 @@
 <% content_for :title, "Data status — Flyway" %>
 
-<h1 class="text-3xl font-semibold tracking-tight">Data status</h1>
+<h1 class="text-2xl font-semibold tracking-tight sm:text-3xl">Data status</h1>
 <p class="mt-2 text-gray-600">
   Where the data comes from, how fresh it is, what is still being collected and what could not be used.
 </p>
@@ -56,7 +56,7 @@
   <h3 class="mt-6 font-semibold">Latest units set aside</h3>
   <ul class="mt-2 divide-y divide-gray-200 rounded-xl border border-gray-200 text-sm text-gray-700">
     <% @dead_units.each do |unit| %>
-      <li class="px-3 py-2"><%= FeedStatus::NAMES.fetch(unit.feed, unit.feed) %> · <%= unit.kind.humanize %> <%= unit.key %> — <%= unit.last_error %></li>
+      <li class="break-words px-3 py-2"><%= FeedStatus::NAMES.fetch(unit.feed, unit.feed) %> · <%= unit.kind.humanize %> <%= unit.key %> — <%= unit.last_error %></li>
     <% end %>
   </ul>
 <% end %>
@@ -94,9 +94,9 @@
   Days, out of the last 365, for which eBird's own count of checklists and observers is held. A day without that
   figure is treated as unknown, never as a day without birds.
 </p>
-<div class="mt-4 grid grid-cols-2 gap-x-6 text-sm sm:grid-cols-3">
+<div class="mt-4 grid grid-cols-2 gap-x-4 text-sm sm:grid-cols-3 sm:gap-x-6">
   <% @coverage.each do |name, days| %>
-    <div class="flex justify-between border-b border-gray-200 py-1.5"><span><%= name %></span><span class="tabular-nums text-gray-600"><%= days %></span></div>
+    <div class="flex justify-between gap-2 border-b border-gray-200 py-1.5"><span class="min-w-0 break-words"><%= name %></span><span class="tabular-nums text-gray-600"><%= days %></span></div>
   <% end %>
 </div>
 

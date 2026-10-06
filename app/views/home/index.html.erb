@@ -1,5 +1,6 @@
 <% content_for :title, "Flyway — did the weather move the birds?" %>
-<% content_for :body_class, "h-dvh" %>
+<%# Wide screens fit everything in the window; narrower ones let the page scroll. %>
+<% content_for :body_class, "min-h-dvh lg:h-dvh" %>
 <% content_for :main_class, "flex min-h-0 flex-1 flex-col" %>
 <% content_for :head do %>
   <%= javascript_include_tag "maplibre-gl" %>
@@ -10,28 +11,29 @@
      data-explorer-activity-url-value="<%= map_activity_path %>"
      data-explorer-wind-url-value="<%= map_wind_path %>"
      data-explorer-sites-value="<%= @sites.to_json %>">
-  <div class="flex flex-wrap items-center gap-x-5 gap-y-2 border-b border-gray-200 px-4 py-2 text-sm">
-    <div class="flex items-center gap-2" role="group" aria-label="Species group">
+  <%# One row that scrolls sideways on narrow screens, so the filters do not push the map down. %>
+  <div class="flex items-center gap-x-5 gap-y-2 border-b border-gray-200 px-4 py-2 text-sm max-sm:overflow-x-auto max-sm:whitespace-nowrap sm:flex-wrap">
+    <div class="flex items-center gap-2 max-sm:shrink-0" role="group" aria-label="Species group">
       <span class="text-gray-500">Show</span>
-      <div class="segmented">
+      <div class="segmented max-sm:flex-nowrap">
         <button type="button" class="explorer-choice" data-explorer-target="group" data-action="explorer#chooseGroup" data-group="all" aria-pressed="true">All birds</button>
         <% @groups.each do |key, name| %>
           <button type="button" class="explorer-choice" data-explorer-target="group" data-action="explorer#chooseGroup" data-group="<%= key %>" aria-pressed="false"><%= name %></button>
         <% end %>
       </div>
     </div>
-    <div class="flex items-center gap-2" role="group" aria-label="Data source">
+    <div class="flex items-center gap-2 max-sm:shrink-0" role="group" aria-label="Data source">
       <span class="text-gray-500">From</span>
-      <div class="segmented">
+      <div class="segmented max-sm:flex-nowrap">
         <%# iNaturalist first: it covers the whole region and year evenly, while eBird is only collected for the counties of featured sites. %>
         <% { "inaturalist" => "iNaturalist", "ebird" => "eBird (site counties)", "both" => "Both" }.each do |key, name| %>
           <button type="button" class="explorer-choice" data-explorer-target="source" data-action="explorer#chooseSource" data-source="<%= key %>" aria-pressed="<%= key == "inaturalist" %>"><%= name %></button>
         <% end %>
       </div>
     </div>
-    <div class="flex items-center gap-2" role="group" aria-label="Zoom to">
+    <div class="flex items-center gap-2 max-sm:shrink-0" role="group" aria-label="Zoom to">
       <span class="text-gray-500">Zoom to</span>
-      <div class="segmented">
+      <div class="segmented max-sm:flex-nowrap">
         <% HomeController::PROVINCE_VIEWS.each do |view| %>
           <button type="button" class="explorer-choice" data-action="explorer#zoomTo" data-bounds="<%= view[:bounds].to_json %>"><%= view[:name] %></button>
         <% end %>
@@ -46,24 +48,29 @@
           aria-controls="ask-panel" aria-expanded="true" data-panel-target="toggle" data-action="panel#toggle">
     <svg viewBox="0 0 16 16" class="size-4 transition-transform max-lg:rotate-90 max-lg:group-aria-expanded:-rotate-90 lg:group-aria-expanded:rotate-180" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3.5 5.5 8l4.5 4.5"/></svg>
   </button>
-  <div class="relative min-h-64 flex-1">
-    <div data-explorer-target="map" class="h-full w-full"></div>
-    <div class="absolute left-3 top-3 max-w-xs rounded-xl border border-gray-200 bg-surface/90 p-3 text-xs leading-relaxed text-gray-700 shadow-sm backdrop-blur">
+  <div class="relative min-h-[max(16rem,55dvh)] flex-1 lg:min-h-64">
+    <%# Pinned to the frame's edges: where the page scrolls, the frame has only a minimum height, which a percentage height cannot follow. %>
+    <div class="absolute inset-0"><div data-explorer-target="map" class="h-full w-full"></div></div>
+    <div class="absolute left-3 top-3 max-w-[min(20rem,calc(100%-4rem))] rounded-xl border border-gray-200 bg-surface/90 p-3 text-xs leading-relaxed text-gray-700 shadow-sm backdrop-blur">
       <p class="font-medium text-gray-900" data-explorer-target="legendTitle">Loading a year of observations…</p>
       <div class="mt-2 h-2 w-full rounded-full" data-explorer-target="legendRamp"></div>
       <div class="mt-1 flex justify-between tabular-nums text-gray-500"><span data-explorer-target="legendLow"></span><span data-explorer-target="legendHigh"></span></div>
-      <ul class="mt-2.5 space-y-1 border-t border-gray-200 pt-2.5">
-        <li><span class="mr-1 inline-block size-3 rounded-sm border border-gray-400 bg-gray-300 align-middle"></span>Grey cell: fewer than 5 bird records, too few to tell.</li>
-        <li>No cell: nobody reported a bird there. That is not the same as no birds.</li>
-        <li>Arrows: wind about 750 m up during the previous night, pointing where the air is going. Most songbirds migrate at night at that height.</li>
-      </ul>
+      <%# Open on wide screens; the explorer folds it on narrow ones, where it would cover the map. %>
+      <details class="mt-2.5 border-t border-gray-200 pt-2" open data-explorer-target="legendNotes">
+        <summary class="cursor-pointer font-medium text-gray-900">How to read the map</summary>
+        <ul class="mt-1.5 space-y-1">
+          <li><span class="mr-1 inline-block size-3 rounded-sm border border-gray-400 bg-gray-300 align-middle"></span>Grey cell: fewer than 5 bird records, too few to tell.</li>
+          <li>No cell: nobody reported a bird there. That is not the same as no birds.</li>
+          <li>Arrows: wind about 750 m up during the previous night, pointing where the air is going. Most songbirds migrate at night at that height.</li>
+        </ul>
+      </details>
     </div>
   </div>
 
-  <div class="border-t border-gray-200 px-4 pb-6 pt-2 lg:pb-3">
+  <div class="border-t border-gray-200 px-4 pb-9 pt-2 lg:pb-3">
     <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
       <%# The explorer marks the button data-playing while the timeline runs; the icon follows. %>
-      <button type="button" class="group grid size-9 shrink-0 place-items-center rounded-full bg-blue-700 text-white shadow-sm transition-colors hover:bg-blue-800"
+      <button type="button" class="group grid size-11 shrink-0 place-items-center rounded-full bg-blue-700 text-white shadow-sm transition-colors hover:bg-blue-800 sm:size-9"
               aria-label="Play" title="Play" data-explorer-target="play" data-action="explorer#togglePlay">
         <svg viewBox="0 0 16 16" class="ml-0.5 size-4 group-data-playing:hidden" fill="currentColor" aria-hidden="true"><path d="M4.5 2.8v10.4a.6.6 0 0 0 .9.5l8.2-5.2a.6.6 0 0 0 0-1L5.4 2.3a.6.6 0 0 0-.9.5z"/></svg>
         <svg viewBox="0 0 16 16" class="hidden size-4 group-data-playing:block" fill="currentColor" aria-hidden="true"><rect x="3.5" y="2.5" width="3" height="11" rx="1"/><rect x="9.5" y="2.5" width="3" height="11" rx="1"/></svg>
@@ -94,7 +101,7 @@
   </div>
   </div>
 
-  <aside id="ask-panel" class="flex max-h-[45dvh] min-h-0 flex-col border-t border-gray-200 lg:max-h-none lg:w-[26rem] lg:border-l lg:border-t-0"
+  <aside id="ask-panel" class="flex min-h-0 flex-col border-t border-gray-200 lg:w-[26rem] lg:border-l lg:border-t-0"
          data-controller="ask" data-panel-target="panel">
     <div class="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-4">
       <h2 class="text-base font-semibold tracking-tight">Ask a question</h2>
@@ -136,14 +143,14 @@
       </details>
     </div>
 
-    <%= form_with url: answers_path, data: { turbo_frame: "answer", ask_target: "form", action: "turbo:submit-start->ask#start turbo:submit-end->ask#finish" }, class: "border-t border-gray-200 p-3" do |form| %>
+    <%= form_with url: answers_path, data: { turbo_frame: "answer", ask_target: "form", action: "turbo:submit-start->ask#start turbo:submit-end->ask#finish" }, class: "border-t border-gray-200 bg-surface p-3 max-lg:sticky max-lg:bottom-0" do |form| %>
       <div class="flex items-end gap-2 rounded-2xl border border-gray-300 py-1.5 pl-3.5 pr-1.5 shadow-sm transition focus-within:border-blue-700 focus-within:ring-2 focus-within:ring-blue-700/20">
         <%= form.text_area :question, rows: 2, maxlength: AnswersController::MAX_QUESTION_LENGTH, required: true,
               placeholder: "Did last night's winds bring more warblers to Tadoussac?", aria: { label: "Your question" },
               data: { ask_target: "question", action: "keydown.enter->ask#submitOnEnter" },
-              class: "min-w-0 flex-1 resize-none bg-transparent py-1.5 text-sm outline-none placeholder:text-gray-400" %>
+              class: "min-w-0 flex-1 resize-none bg-transparent py-1.5 text-base outline-none placeholder:text-gray-400 lg:text-sm" %>
         <%= form.button type: :submit, name: nil, title: "Ask", aria: { label: "Ask" }, data: { ask_target: "submit" },
-              class: "grid size-8 shrink-0 place-items-center rounded-full bg-blue-700 text-white transition-colors hover:bg-blue-800 disabled:opacity-40" do %>
+              class: "grid size-10 shrink-0 place-items-center rounded-full bg-blue-700 text-white transition-colors hover:bg-blue-800 disabled:opacity-40 lg:size-8" do %>
           <svg viewBox="0 0 16 16" class="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 13V3M3.5 7.5 8 3l4.5 4.5"/></svg>
         <% end %>
       </div>
