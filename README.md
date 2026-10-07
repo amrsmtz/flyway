@@ -232,8 +232,9 @@ bin/rails "ingestion:run[open_meteo,3600]"   # likewise inaturalist and ebird
 bin/dev                                       # http://localhost:3010
 ```
 
-Deployment uses Kamal (`bin/kamal deploy`) to a single ARM64 virtual machine running the app, a job container
-and TimescaleDB.
+Deployment uses Kamal (`bin/kamal deploy`) to a single ARM64 virtual machine running four containers: Kamal's
+proxy (HTTPS and zero-downtime switching), the web app, a job container for Solid Queue, and TimescaleDB. The
+web and job containers run the same image and are replaced on each deploy; the proxy and the database stay up.
 
 ## How AI tools were used
 

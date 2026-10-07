@@ -7,9 +7,17 @@ which free managed PostgreSQL tiers do not offer.
 
 ## Decision
 
-One Oracle Cloud ARM virtual machine (2 cores, 12 GB) running three containers deployed with Kamal: the web
-app, a job container for ingestion, and TimescaleDB as an accessory, reachable only from the machine itself.
-HTTPS comes from Kamal's proxy and Let's Encrypt.
+One Oracle Cloud ARM virtual machine (2 cores, 12 GB) running four containers deployed with Kamal:
+
+- **kamal-proxy**, the only one open to the internet (ports 80 and 443): it obtains the Let's Encrypt
+  certificate and switches traffic to a new version without downtime;
+- **the web app** (Rails behind Thruster), reachable only through the proxy;
+- **a job container** running Solid Queue, for ingestion and for answering the suggested questions ahead of time;
+- **TimescaleDB** as an accessory, listening on the machine's loopback address only.
+
+The web and job containers run the same image with a different command and are replaced on each deploy. The
+proxy and the database are not, which is what lets a deploy leave the data alone. One PostgreSQL instance holds
+four databases: the application's, and those of Solid Queue, Solid Cache and Solid Cable.
 
 ## What it took
 
